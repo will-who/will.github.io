@@ -1,0 +1,487 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #10151f;
+    color: #e8ebf0;
+    min-height: 100vh;
+}
+
+
+/* -------------------------
+   TOP BAR
+------------------------- */
+
+.topbar {
+    height: 78px;
+    background: #12141b;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 22px;
+    gap: 25px;
+}
+
+.logo {
+    font-size: 38px;
+    color: #168cff;
+    width: 60px;
+}
+
+.arrows {
+    display: flex;
+    gap: 5px;
+}
+
+.arrows button {
+    width: 31px;
+    height: 31px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #292c34;
+    color: #ddd;
+
+    font-size: 20px;
+}
+
+nav {
+    display: flex;
+    gap: 42px;
+    margin-left: 15px;
+}
+
+nav a {
+    color: #aeb3bd;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    height: 78px;
+    display: flex;
+    align-items: center;
+
+    position: relative;
+}
+
+nav a:hover {
+    color: white;
+}
+
+nav a.active {
+    color: white;
+}
+
+nav a.active::after {
+    content: "";
+
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+    background: #168cff;
+}
+
+.notification {
+    margin-left: auto;
+    font-size: 25px;
+    color: #bbb;
+}
+
+
+/* -------------------------
+   FAVORITES
+------------------------- */
+
+.favorites-bar {
+    height: 63px;
+
+    margin: 0 9px;
+
+    background: #24272e;
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+    gap: 25px;
+}
+
+.favorites-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #9da3ad;
+}
+
+.favorite-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #f2f2f2;
+    color: #111;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 25px;
+}
+
+.add-button {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: #3a3e47;
+    color: white;
+
+    font-size: 25px;
+}
+
+
+/* -------------------------
+   MAIN LAYOUT
+------------------------- */
+
+.layout {
+    display: flex;
+}
+
+
+/* -------------------------
+   SIDEBAR
+------------------------- */
+
+.sidebar {
+    width: 235px;
+    padding: 44px 9px 0 9px;
+}
+
+.search {
+    width: 216px;
+    height: 45px;
+
+    border: 1px solid #d9dce2;
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 10px;
+}
+
+.search input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+    font-size: 16px;
+}
+
+.search input::placeholder {
+    color: #b8bdc7;
+}
+
+.search span {
+    font-size: 28px;
+    color: #b8bdc7;
+}
+
+.menu {
+    margin-top: 26px;
+}
+
+.menu-item {
+    height: 38px;
+
+    padding: 0 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #bfc4cc;
+    font-size: 16px;
+}
+
+.menu-item small {
+    background: #202833;
+    border-radius: 12px;
+
+    min-width: 30px;
+    text-align: center;
+
+    padding: 4px 7px;
+
+    color: #d8dce2;
+}
+
+.menu-item.selected {
+    background: #202936;
+    border-left: 2px solid #168cff;
+
+    color: white;
+    font-weight: bold;
+}
+
+.menu hr {
+    border: none;
+    border-top: 1px solid #2b3039;
+    margin: 10px 0;
+}
+
+
+/* -------------------------
+   CONTENT
+------------------------- */
+
+.content {
+    flex: 1;
+    padding: 43px 25px;
+}
+
+.content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+h1 {
+    font-size: 29px;
+    color: white;
+}
+
+.sort {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #c6cad1;
+}
+
+.sort button {
+    background: #282c34;
+    border: none;
+    color: #e2e4e8;
+
+    padding: 10px 14px;
+
+    border-radius: 5px;
+
+    font-size: 15px;
+}
+
+
+/* -------------------------
+   GAME CARDS
+------------------------- */
+
+.games {
+    display: flex;
+    gap: 27px;
+    flex-wrap: wrap;
+}
+
+.game-card {
+    width: 207px;
+}
+
+.game-image {
+    width: 207px;
+    height: 275px;
+
+    border-radius: 5px;
+
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: flex-end;
+}
+
+
+/* Fake game artwork */
+
+.overwatch {
+    background:
+        radial-gradient(circle at 70% 30%, #ff6b9c, transparent 20%),
+        linear-gradient(145deg, #318bd4, #713a9d 50%, #151a35);
+}
+
+.sea {
+    background:
+        radial-gradient(circle at 35% 25%, #d9d0aa, transparent 13%),
+        linear-gradient(160deg, #816044, #3b2b2a 45%, #17181d);
+}
+
+.fantasy {
+    background:
+        radial-gradient(circle at 60% 20%, #ffb340, transparent 15%),
+        linear-gradient(145deg, #7c4c24, #243e55 50%, #151b27);
+}
+
+
+/* Game title inside image */
+
+.game-title {
+    width: 100%;
+
+    padding: 25px 12px 18px;
+
+    background: linear-gradient(
+        transparent,
+        rgba(0, 0, 0, 0.85)
+    );
+
+    color: white;
+
+    font-size: 23px;
+    font-weight: 900;
+
+    text-align: center;
+
+    letter-spacing: 1px;
+}
+
+
+/* Favorite star */
+
+.star {
+    position: absolute;
+
+    top: 5px;
+    left: 5px;
+
+    width: 31px;
+    height: 31px;
+
+    background: #101b22;
+
+    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffd000;
+
+    z-index: 2;
+}
+
+.star.empty {
+    color: #888;
+}
+
+
+/* Text under cards */
+
+.game-card h3 {
+    margin-top: 11px;
+
+    font-size: 16px;
+    color: #e7e9ed;
+}
+
+.game-card p {
+    margin-top: 7px;
+
+    font-size: 14px;
+    color: #9ea5af;
+}
+
+.installed {
+    margin-top: 7px;
+
+    color: #aab1bb;
+    font-size: 14px;
+}
+
+.installed span {
+    color: #7cff00;
+    font-size: 18px;
+}
+
+
+/* -------------------------
+   RESPONSIVE
+------------------------- */
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    .search {
+        width: 170px;
+    }
+
+    nav {
+        gap: 15px;
+    }
+
+    nav a {
+        font-size: 14px;
+    }
+
+    .game-card,
+    .game-image {
+        width: 180px;
+    }
+
+    .game-image {
+        height: 240px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .content {
+        padding: 25px 15px;
+    }
+
+    .games {
+        justify-content: center;
+    }
+
+    .content-header {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .favorites-bar {
+        margin-top: 0;
+    }
+
+    nav a:nth-child(1),
+    nav a:nth-child(3),
+    nav a:nth-child(4) {
+        display: none;
+    }
+}
