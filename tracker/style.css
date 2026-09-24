@@ -1,4 +1,4 @@
-* {
+nav a.active::after* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -25,30 +25,6 @@ body {
 
     padding: 0 22px;
     gap: 25px;
-}
-
-.logo {
-    font-size: 38px;
-    color: #168cff;
-    width: 60px;
-}
-
-.arrows {
-    display: flex;
-    gap: 5px;
-}
-
-.arrows button {
-    width: 31px;
-    height: 31px;
-
-    border: none;
-    border-radius: 5px;
-
-    background: #292c34;
-    color: #ddd;
-
-    font-size: 20px;
 }
 
 nav {
@@ -88,7 +64,7 @@ nav a.active::after {
     right: 0;
 
     height: 3px;
-    background: #168cff;
+    background: #4a4b4e;
 }
 
 .notification {
@@ -236,7 +212,7 @@ nav a.active::after {
 
 .menu-item.selected {
     background: #202936;
-    border-left: 2px solid #168cff;
+    border-left: 2px solid #454648;
 
     color: white;
     font-weight: bold;
@@ -323,23 +299,12 @@ h1 {
 /* Fake game artwork */
 
 .overwatch {
-    background:
-        radial-gradient(circle at 70% 30%, #ff6b9c, transparent 20%),
-        linear-gradient(145deg, #318bd4, #713a9d 50%, #151a35);
+    background-image: url("oreratch.png");
 }
 
-.sea {
-    background:
-        radial-gradient(circle at 35% 25%, #d9d0aa, transparent 13%),
-        linear-gradient(160deg, #816044, #3b2b2a 45%, #17181d);
+.rivals {
+    background-image: url("rirarls.png");
 }
-
-.fantasy {
-    background:
-        radial-gradient(circle at 60% 20%, #ffb340, transparent 15%),
-        linear-gradient(145deg, #7c4c24, #243e55 50%, #151b27);
-}
-
 
 /* Game title inside image */
 
@@ -362,7 +327,6 @@ h1 {
 
     letter-spacing: 1px;
 }
-
 
 /* Favorite star */
 
