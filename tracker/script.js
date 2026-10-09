@@ -1,3 +1,4 @@
+alert ("Welcome to the Tracker! Please log in or register to continue." );
 const accountButton =
     document.getElementById("accountButton");
 
@@ -144,7 +145,7 @@ loginForm.addEventListener("submit", async (event) => {
     try {
 
         const response = await fetch(
-            "/api/auth/login",
+            "api/login.php",
             {
                 method: "POST",
 
@@ -229,7 +230,7 @@ registerForm.addEventListener(
         try {
 
             const response = await fetch(
-                "/api/auth/register",
+                "api/register.php",
                 {
                     method: "POST",
 
