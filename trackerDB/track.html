@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Game Launcher</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         TOP NAVIGATION
+    ========================== -->
+
+    <header class="topbar">
+
+        <nav>
+
+            <a href="#" class="active">
+                HOME
+            </a>
+
+            <a href="#">
+                FRIENDS
+            </a>
+
+            <a href="#">
+                GLOBAL CHATROOM
+            </a>
+
+        </nav>
+
+
+        <div class="topbar-right">
+
+            <button class="notification">
+                🕭
+            </button>
+
+            <button
+                class="account-button"
+                id="accountButton"
+            >
+                LOGIN
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         GAME LIBRARY
+    ========================== -->
+
+    <div class="layout">
+
+
+        <!-- =====================
+             SIDEBAR
+        ====================== -->
+
+        <aside class="sidebar">
+
+            <div class="search">
+
+                <input
+                    type="text"
+                    placeholder="Search games"
+                >
+
+                <span>⌕</span>
+
+            </div>
+
+
+            <div class="menu">
+
+                <div class="menu-item">
+
+                    <span>
+                        All Our Games
+                    </span>
+
+                    <small>
+                        2
+                    </small>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- =====================
+             MAIN CONTENT
+        ====================== -->
+
+        <main class="content">
+
+
+            <div class="content-header">
+
+                <h1>
+                    Our Games
+                </h1>
+
+            </div>
+
+
+
+            <!-- =====================
+                 GAME CARDS
+            ====================== -->
+
+            <div class="games">
+
+
+                <!-- OVERWATCH -->
+
+                <div class="game-card">
+
+                    <div class="game-image overwatch">
+
+                        <div class="game-title">
+                            OVERWATCH
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        Overwatch
+                    </h3>
+
+                    <p>
+                        First person shooter
+                    </p>
+
+                </div>
+
+
+
+                <!-- MARVEL RIVALS -->
+
+                <div class="game-card">
+
+                    <div class="game-image rivals">
+
+                        <div class="game-title">
+
+                            MARVEL
+                            <br>
+                            RIVALS
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        Marvel Rivals
+                    </h3>
+
+                    <p>
+                        First person shooter
+                    </p>
+
+                </div>
+
+
+
+                
+
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- =========================
+         LOGIN / REGISTER POPUP
+    ========================== -->
+
+    <div
+        class="auth-overlay"
+        id="authOverlay"
+    >
+
+        <div class="auth-box">
+
+
+            <button
+                class="close-auth"
+                id="closeAuth"
+            >
+                ×
+            </button>
+
+
+
+            <!-- LOGIN -->
+
+            <div id="loginSection">
+
+                <h2>
+                    Welcome Back
+                </h2>
+
+                <p class="auth-subtitle">
+                    Login to your account
+                </p>
+
+
+                <form id="loginForm">
+
+
+                    <label for="loginUsername">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="loginUsername"
+                        placeholder="Enter your username"
+                        required
+                    >
+
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="auth-submit"
+                    >
+                        LOGIN
+                    </button>
+
+                </form>
+
+
+                <div class="auth-switch">
+
+                    Don't have an account?
+
+                    <button id="showRegister">
+                        SIGN UP
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REGISTER -->
+
+            <div
+                id="registerSection"
+                style="display: none;"
+            >
+
+                <h2>
+                    Create Account
+                </h2>
+
+                <p class="auth-subtitle">
+                    Create your game launcher account
+                </p>
+
+
+                <form id="registerForm">
+
+
+                    <label for="registerUsername">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="registerUsername"
+                        placeholder="Choose a username"
+                        required
+                    >
+
+
+                    <label for="registerEmail">
+
+                        Email
+
+                        <span>
+                            (optional)
+                        </span>
+
+                    </label>
+
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Your email"
+                    >
+
+
+                    <label for="registerPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        placeholder="Choose a password"
+                        required
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="auth-submit"
+                    >
+                        CREATE ACCOUNT
+                    </button>
+
+                </form>
+
+
+                <div class="auth-switch">
+
+                    Already have an account?
+
+                    <button id="showLogin">
+                        LOGIN
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="auth-message"
+                id="authMessage"
+            ></div>
+
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
