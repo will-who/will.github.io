@@ -1094,3 +1094,53 @@ h1 {
     }
 
 }
+
+
+/* =========================================================
+   STANDALONE LOGIN / REGISTER PAGES (bez JS)
+========================================================= */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-page .auth-box {
+    margin: 20px 0;
+}
+
+.auth-box a.close-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.auth-switch a {
+    color: #bfc1c4;
+    font-weight: bold;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.auth-switch a:hover {
+    color: white;
+}
+
+/* Tlačidlo/odkaz v hornej lište */
+a.account-button {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logout-form {
+    display: inline-flex;
+}
+
+.username {
+    color: #dfe2e7;
+    font-size: 14px;
+    font-weight: bold;
+}

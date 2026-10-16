@@ -1,38 +1,19 @@
 <?php
-// Pripojenie na databázu "tracker" (XAMPP default)
-const DB_HOST = 'localhost';
-const DB_NAME = 'tracker';
-const DB_USER = 'root';
-const DB_PASS = '';
 
-header('Content-Type: application/json; charset=utf-8');
+    $db_server = "localhost";
+    $db_user = "root";
+    $db_pass = "";
+    $db_name = "tracker";
 
-function db(): PDO {
-    static $pdo = null;
-    if ($pdo === null) {
-        $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-            DB_USER,
-            DB_PASS,
-            [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ]
-        );
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+    try {
+        $conn = mysqli_connect($db_server, $db_user, $db_pass, $db_name);
+        mysqli_set_charset($conn, "utf8mb4");
     }
-    return $pdo;
-}
-
-function respond(array $data, int $code = 200): void {
-    http_response_code($code);
-    echo json_encode($data);
-    exit;
-}
-
-function read_json(): array {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        respond(['message' => 'Method not allowed.'], 405);
+    catch (mysqli_sql_exception $e) {
+        http_response_code(500);
+        die("Nepodarilo sa pripojiť k databáze.");
     }
-    $data = json_decode(file_get_contents('php://input'), true);
-    return is_array($data) ? $data : [];
-}
+
+?>

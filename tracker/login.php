@@ -1,35 +1,88 @@
 <?php
-require __DIR__ . '/db.php';
 
-$in       = read_json();
-$username = trim($in['username'] ?? '');
-$password = $in['password'] ?? '';
+    include("auth.php");
 
-if ($username === '' || $password === '') {
-    respond(['message' => 'Enter username and password.'], 400);
-}
-
-try {
-    $pdo  = db();
-    $stmt = $pdo->prepare('SELECT id, username, password_hash, is_active FROM users WHERE username = ? OR email = ? LIMIT 1');
-    $stmt->execute([$username, $username]);
-    $user = $stmt->fetch();
-
-    if (!$user || !password_verify($password, $user['password_hash'])) {
-        respond(['message' => 'Invalid username or password.'], 401);
-    }
-    if (!$user['is_active']) {
-        respond(['message' => 'Account is disabled.'], 403);
+    if (current_user($conn)) {
+        header("Location: track.php");
+        exit;
     }
 
-    session_start();
-    session_regenerate_id(true);
-    $_SESSION['user_id']  = (int) $user['id'];
-    $_SESSION['username'] = $user['username'];
+    $error = "";
+    $username = "";
 
-    $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = ?')->execute([$user['id']]);
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    respond(['username' => $user['username']]);
-} catch (PDOException $e) {
-    respond(['message' => 'Database error.'], 500);
-}
+        $username = trim($_POST["user"] ?? "");
+        $password = $_POST["pass"] ?? "";
+
+        if (!csrf_valid()) {
+            $error = "Neplatný formulár, skús to znova.";
+        }
+        elseif ($username === "" || $password === "") {
+            $error = "Vyplň meno aj heslo.";
+        }
+        else {
+            $stmt = mysqli_prepare($conn,
+                "SELECT id, password_hash, is_active FROM users WHERE username = ? LIMIT 1");
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+            if ($row && $row["is_active"] && password_verify($password, $row["password_hash"])) {
+                session_regenerate_id(true);
+                create_login_session($conn, (int)$row["id"]);
+                header("Location: track.php");
+                exit;
+            }
+
+            // zámerne rovnaká správa pre zlé meno aj zlé heslo
+            $error = "Nesprávne meno alebo heslo.";
+        }
+    }
+
+?>
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+</head>
+<body class="auth-page">
+
+    <div class="auth-box">
+
+        <a class="close-auth" href="track.php">×</a>
+
+        <h2>Welcome Back</h2>
+        <p class="auth-subtitle">Login to your account</p>
+
+        <form method="POST" action="login.php">
+            <?= csrf_field() ?>
+
+            <label for="user">Username</label>
+            <input type="text" id="user" name="user"
+                   placeholder="Enter your username"
+                   value="<?= e($username) ?>" required>
+
+            <label for="pass">Password</label>
+            <input type="password" id="pass" name="pass"
+                   placeholder="Enter your password" required>
+
+            <button type="submit" class="auth-submit">LOGIN</button>
+        </form>
+
+        <?php if ($error): ?>
+            <div class="auth-message"><?= e($error) ?></div>
+        <?php endif; ?>
+
+        <div class="auth-switch">
+            Don't have an account?
+            <a href="register.php">SIGN UP</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
