@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hostiteľ: 127.0.0.1
--- Čas generovania: Pi 09.Okt 2026, 07:23
+-- Čas generovania: Pi 16.Okt 2026, 09:31
 -- Verzia serveru: 10.4.32-MariaDB
 -- Verzia PHP: 8.2.12
 
@@ -50,6 +50,13 @@ CREATE TABLE `sessions` (
   `expires_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Sťahujem dáta pre tabuľku `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
+(2, 1, '9fc678e37aac2ddcc13cd6d784079c4b509a2c680c2911408271dcbd68538289', '::1', '2026-10-16 07:26:08', '2026-10-23 09:26:08');
+
 -- --------------------------------------------------------
 
 --
@@ -65,6 +72,13 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Sťahujem dáta pre tabuľku `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `is_active`, `created_at`, `last_login`) VALUES
+(1, 'peso', 'lubkobernhauser2@gmail.com', '$2y$10$9iWg1Ew2uLg385dX1PlXOebmxAH9ug9w7q7idMEmDm1sQhY.YhQ82', 1, '2026-10-16 07:22:02', '2026-10-16 07:26:08');
 
 --
 -- Kľúče pre exportované tabuľky
@@ -108,13 +122,13 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT pre tabuľku `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pre tabuľku `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Obmedzenie pre exportované tabuľky
