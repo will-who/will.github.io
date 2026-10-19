@@ -545,6 +545,16 @@ h1 {
 
 }
 
+.deadlock {
+
+    background-image:
+        url("rem.png");
+
+    background-size: cover;
+
+    background-position: center;
+
+}
 
 .rivals {
 

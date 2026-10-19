@@ -116,7 +116,7 @@
                     </span>
 
                     <small>
-                        1
+                        2
                     </small>
 
                 </div>
@@ -184,8 +184,6 @@
             <div class="games">
 
 
-                <!-- OVERWATCH -->
-
                 <div class="game-card">
 
                     <div class="game-image overwatch">
@@ -202,59 +200,47 @@
 
                     </div>
 
-
-                    <h3>
-                        Overwatch
-                    </h3>
-
-
-                    <p>
-                        First person shooter
-                    </p>
-
                 </div>
 
+                <div class="game-card">
 
+                    <div class="game-image deadlock">
 
-                <!-- MARVEL RIVALS -->
+                        <?php if ($user): ?>
+                        <span class="star">
+                            ★
+                        </span>
+                        <?php endif; ?>
+
+                        <div class="game-title">
+                            DEADLOCK
+                        </div>
+
+                    </div>
+
+                </div>
 
                 <div class="game-card">
 
                     <div class="game-image rivals">
 
                         <?php if ($user): ?>
-                        <span class="star empty">
+                        <span class="star">
                             ☆
                         </span>
                         <?php endif; ?>
 
                         <div class="game-title">
-
-                            MARVEL
-                            <br>
-                            RIVALS
-
+                            MARVEL RIVALS
                         </div>
 
                     </div>
 
-
-                    <h3>
-                        Marvel Rivals
-                    </h3>
-
-
-                    <p>
-                        First person shooter
-                    </p>
-
                 </div>
 
+                <div class="game-card">
 
-
-                
-
-
+                </div>
             </div>
 
         </main>
