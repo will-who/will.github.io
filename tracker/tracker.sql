@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hostiteľ: 127.0.0.1
--- Čas generovania: Pi 16.Okt 2026, 09:31
+-- Čas generovania: Pi 09.Okt 2026, 07:23
 -- Verzia serveru: 10.4.32-MariaDB
 -- Verzia PHP: 8.2.12
 
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Databáza: `tracker`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Štruktúra tabuľky pre tabuľku `games`
+--
+
+CREATE TABLE `games` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `genre` varchar(100) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Sťahujem dáta pre tabuľku `games`
+--
+
+INSERT INTO `games` (`id`, `name`, `genre`, `image`, `description`) VALUES
+(1, 'Overwatch', 'First person shooter', 'oreratch.png', 'Team-based hero shooter where two teams fight over objectives. Pick a hero from the tank, damage or support roles and combine abilities with your team to win each match.'),
+(2, 'Marvel Rivals', 'Third person shooter', 'rirarls.png', 'Fast 6v6 hero shooter featuring Marvel characters. Each hero has unique abilities and team-up powers, and the maps can be partly destroyed during the fight.');
 
 -- --------------------------------------------------------
 
@@ -50,13 +73,6 @@ CREATE TABLE `sessions` (
   `expires_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Sťahujem dáta pre tabuľku `sessions`
---
-
-INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
-(2, 1, '9fc678e37aac2ddcc13cd6d784079c4b509a2c680c2911408271dcbd68538289', '::1', '2026-10-16 07:26:08', '2026-10-23 09:26:08');
-
 -- --------------------------------------------------------
 
 --
@@ -74,15 +90,15 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `is_active`, `created_at`, `last_login`) VALUES
-(1, 'peso', 'lubkobernhauser2@gmail.com', '$2y$10$9iWg1Ew2uLg385dX1PlXOebmxAH9ug9w7q7idMEmDm1sQhY.YhQ82', 1, '2026-10-16 07:22:02', '2026-10-16 07:26:08');
-
---
 -- Kľúče pre exportované tabuľky
 --
+
+--
+-- Indexy pre tabuľku `games`
+--
+ALTER TABLE `games`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_games_name` (`name`);
 
 --
 -- Indexy pre tabuľku `password_resets`
@@ -113,6 +129,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT pre tabuľku `games`
+--
+ALTER TABLE `games`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT pre tabuľku `password_resets`
 --
 ALTER TABLE `password_resets`
@@ -122,13 +144,13 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT pre tabuľku `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pre tabuľku `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Obmedzenie pre exportované tabuľky

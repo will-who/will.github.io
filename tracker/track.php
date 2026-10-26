@@ -1,6 +1,10 @@
 <?php
     include("auth.php");
     $user = current_user($conn);
+
+    // Hry z databázy
+    $games = mysqli_query($conn, "SELECT id, name, genre, image FROM games ORDER BY name");
+    $totalGames = mysqli_num_rows($games);
     
 ?>
 
@@ -116,7 +120,7 @@
                     </span>
 
                     <small>
-                        2
+                        1
                     </small>
 
                 </div>
@@ -134,7 +138,7 @@
                     </span>
 
                     <small>
-                        36
+                        <?= $totalGames ?>
                     </small>
 
                 </div>
@@ -184,63 +188,53 @@
             <div class="games">
 
 
-                <div class="game-card">
+                <?php while ($game = mysqli_fetch_assoc($games)): ?>
 
-                    <div class="game-image overwatch">
+                <?php
+                    // bezpečná cesta k obrázku (zakóduje aj úvodzovky a pod.)
+                    $img = $game["image"]
+                        ? str_replace("%2F", "/", rawurlencode($game["image"]))
+                        : "";
+                ?>
 
-                        <?php if ($user): ?>
-                        <span class="star">
-                            ★
-                        </span>
+                <a class="game-card" href="game.php?id=<?= (int)$game["id"] ?>">
+
+                    <div
+                        class="game-image"
+                        <?php if ($img): ?>
+                        style="background-image: url('<?= $img ?>');"
                         <?php endif; ?>
-
-                        <div class="game-title">
-                            OVERWATCH
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="game-card">
-
-                    <div class="game-image deadlock">
+                    >
 
                         <?php if ($user): ?>
-                        <span class="star">
-                            ★
-                        </span>
-                        <?php endif; ?>
-
-                        <div class="game-title">
-                            DEADLOCK
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="game-card">
-
-                    <div class="game-image rivals">
-
-                        <?php if ($user): ?>
-                        <span class="star">
+                        <span class="star empty">
                             ☆
                         </span>
                         <?php endif; ?>
 
                         <div class="game-title">
-                            MARVEL RIVALS
+                            <?= e(mb_strtoupper($game["name"], "UTF-8")) ?>
                         </div>
 
                     </div>
 
-                </div>
 
-                <div class="game-card">
+                    <h3>
+                        <?= e($game["name"]) ?>
+                    </h3>
 
-                </div>
+
+                    <?php if ($game["genre"]): ?>
+                    <p>
+                        <?= e($game["genre"]) ?>
+                    </p>
+                    <?php endif; ?>
+
+                </a>
+
+                <?php endwhile; ?>
+
+
             </div>
 
         </main>
