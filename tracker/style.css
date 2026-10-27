@@ -1235,3 +1235,93 @@ a.game-card:hover .game-image {
         height: 320px;
     }
 }
+
+
+
+/* Predný obrázok (logo) na obrázku hry */
+
+.game-image .game-title,
+.game-detail-image .game-title {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-width: 0;
+    overflow: hidden;
+    padding: 40px 8px 14px;
+}
+
+/* Pevná šírka v % -> logo sa vždy zmestí do karty, nech je pôvodný obrázok akokoľvek veľký */
+.game-image .game-title .game-logo,
+.game-detail-image .game-title .game-logo {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    flex: 0 1 auto;
+    object-fit: contain;
+}
+
+.game-detail-image {
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+
+/* Obrázok sa nesmie opakovať (inak sa pri menšej veľkosti "dláždi") */
+.game-image,
+.game-detail-image {
+    background-repeat: no-repeat;
+}
+
+
+/* =========================================================
+   ADMIN (add / edit game)
+========================================================= */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.game-card-wrap {
+    position: relative;
+    width: 207px;
+}
+
+.edit-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 3;
+    padding: 6px 10px;
+    border-radius: 5px;
+    background: rgba(16, 27, 34, 0.9);
+    border: 1px solid #3a3e47;
+    color: #dfe2e7;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.edit-button:hover {
+    background: #3b3f48;
+    color: white;
+}
+
+.auth-message.ok {
+    color: #7cff00;
+}
+
+.auth-message.muted {
+    color: #9299a5;
+}
+
+@media (max-width: 800px) {
+    .game-card-wrap {
+        width: 180px;
+    }
+}

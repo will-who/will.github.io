@@ -63,7 +63,7 @@
         $hash = hash("sha256", $_COOKIE[AUTH_COOKIE]);
 
         $stmt = mysqli_prepare($conn,
-            "SELECT u.id, u.username, u.email
+            "SELECT u.id, u.username, u.email, u.role
                FROM sessions s
                JOIN users u ON u.id = s.user_id
               WHERE s.token = ? AND s.expires_at > NOW() AND u.is_active = 1
@@ -90,6 +90,76 @@
         ]);
         // upratanie expirovaných sessions
         mysqli_query($conn, "DELETE FROM sessions WHERE expires_at < NOW()");
+    }
+
+    // Bezpečná URL/cesta k obrázku z DB (podporuje lokálny súbor aj http/https odkaz)
+    function img_url($path) {
+        $path = trim((string)$path);
+        if ($path === "") {
+            return "";
+        }
+        if (preg_match('#^https?://#i', $path)) {
+            if (!filter_var($path, FILTER_VALIDATE_URL)) {
+                return "";
+            }
+            return strtr($path, [
+                "'" => "%27", '"' => "%22", "(" => "%28", ")" => "%29",
+                " " => "%20", "\\" => "%5C", "<" => "%3C", ">" => "%3E",
+            ]);
+        }
+        return str_replace("%2F", "/", rawurlencode($path));
+    }
+
+    // Bezpečná hodnota pre CSS (background-size / background-position) z DB
+    function css_val($v, $default) {
+        $v = trim((string)$v);
+        return preg_match('/^[a-z0-9 %.\-]{1,50}$/i', $v) ? $v : $default;
+    }
+
+    /* ---------- Admin / správa hier ---------- */
+
+    function is_admin($user) {
+        return $user && ($user["role"] ?? "user") === "admin";
+    }
+
+    // Stránka je len pre admina: hosť -> login, bežný user -> 403
+    function require_admin($conn) {
+        $u = current_user($conn);
+        if (!$u) {
+            header("Location: login.php");
+            exit;
+        }
+        if (!is_admin($u)) {
+            http_response_code(403);
+            die("Access denied.");
+        }
+        return $u;
+    }
+
+    function valid_image_src($s) {
+        if (preg_match('#^https?://#i', $s)) {
+            return strlen($s) <= 500 && filter_var($s, FILTER_VALIDATE_URL) !== false;
+        }
+        return preg_match('/^[A-Za-z0-9_\-.\/]{1,255}$/', $s) && strpos($s, "..") === false;
+    }
+
+    function game_input() {
+        return [
+            "title" => trim($_POST["title"] ?? ""),
+            "tags"  => trim($_POST["tags"]  ?? ""),
+            "image" => trim($_POST["image"] ?? ""),
+        ];
+    }
+
+    // Vráti text chyby alebo "" ak je všetko v poriadku
+    function game_validate($v) {
+        if ($v["title"] === "")                     return "Game title is required.";
+        if (mb_strlen($v["title"], "UTF-8") > 100)  return "Game title is too long (max 100 characters).";
+        if (mb_strlen($v["tags"], "UTF-8") > 100)   return "Tags are too long (max 100 characters).";
+        if ($v["image"] !== "" && !valid_image_src($v["image"])) {
+            return "Img source must be an https:// link or a file path like img/game.png.";
+        }
+        return "";
     }
 
     function e($s) {

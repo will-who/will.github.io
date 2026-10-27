@@ -9,7 +9,7 @@
 
     if ($id) {
         $stmt = mysqli_prepare($conn,
-            "SELECT id, name, genre, image, description FROM games WHERE id = ? LIMIT 1");
+            "SELECT id, name, genre, image_back, image_front, image_size, image_position, description FROM games WHERE id = ? LIMIT 1");
         mysqli_stmt_bind_param($stmt, "i", $id);
         mysqli_stmt_execute($stmt);
         $game = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
@@ -19,9 +19,8 @@
         http_response_code(404);
     }
 
-    $img = ($game && $game["image"])
-        ? str_replace("%2F", "/", rawurlencode($game["image"]))
-        : "";
+    $imgBack  = $game ? img_url($game["image_back"])  : "";
+    $imgFront = $game ? img_url($game["image_front"]) : "";
 
 ?>
 <!DOCTYPE html>
@@ -30,7 +29,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $game ? e($game["name"]) : "Game not found" ?> – Game Launcher</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
 
 <body>
@@ -75,10 +74,16 @@
 
                 <div
                     class="game-detail-image"
-                    <?php if ($img): ?>
-                    style="background-image: url('<?= $img ?>');"
+                    <?php if ($imgBack): ?>
+                    style="background-image: url('<?= e($imgBack) ?>'); background-size: <?= e(css_val($game["image_size"], "cover")) ?>; background-position: <?= e(css_val($game["image_position"], "center")) ?>;"
                     <?php endif; ?>
-                ></div>
+                >
+                    <?php if ($imgFront): ?>
+                    <div class="game-title">
+                        <img class="game-logo" src="<?= e($imgFront) ?>" alt="<?= e($game["name"]) ?>">
+                    </div>
+                    <?php endif; ?>
+                </div>
 
                 <div class="game-detail-info">
 

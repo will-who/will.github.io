@@ -3,7 +3,7 @@
     $user = current_user($conn);
 
     // Hry z databázy
-    $games = mysqli_query($conn, "SELECT id, name, genre, image FROM games ORDER BY name");
+    $games = mysqli_query($conn, "SELECT id, name, genre, image_back, image_front, image_size, image_position FROM games ORDER BY name");
     $totalGames = mysqli_num_rows($games);
     
 ?>
@@ -15,7 +15,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Launcher</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
 
 <body>
@@ -101,7 +101,7 @@
                 <div class="menu-item selected">
 
                     <span>
-                        <?= $user ? "Your Library" : "Most Used" ?>
+                        <?= $user ? "Your Library" : "All Games" ?>
                     </span>
 
                     <small>
@@ -159,13 +159,18 @@
             <div class="content-header">
 
                 <h1>
-                    <?= $user ? "Your Games" : "Most Used" ?>
+                    <?= $user ? "Your Games" : "All Games" ?>
                 </h1>
 
 
-                <?php if ($user): ?>
+                <div class="header-actions">
 
-                <div class="sort">
+                    <?php if (is_admin($user)): ?>
+                    <a href="add-game.php" class="account-button add-game-button">+ ADD GAME</a>
+                    <?php endif; ?>
+
+                    <?php if ($user): ?>
+                    <div class="sort">
 
                     Sort by:
 
@@ -174,8 +179,9 @@
                     </button>
 
                 </div>
+                    <?php endif; ?>
 
-                <?php endif; ?>
+                </div>
 
             </div>
 
@@ -191,18 +197,18 @@
                 <?php while ($game = mysqli_fetch_assoc($games)): ?>
 
                 <?php
-                    // bezpečná cesta k obrázku (zakóduje aj úvodzovky a pod.)
-                    $img = $game["image"]
-                        ? str_replace("%2F", "/", rawurlencode($game["image"]))
-                        : "";
+                    $imgBack  = img_url($game["image_back"]);
+                    $imgFront = img_url($game["image_front"]);
                 ?>
+
+                <div class="game-card-wrap">
 
                 <a class="game-card" href="game.php?id=<?= (int)$game["id"] ?>">
 
                     <div
                         class="game-image"
-                        <?php if ($img): ?>
-                        style="background-image: url('<?= $img ?>');"
+                        <?php if ($imgBack): ?>
+                        style="background-image: url('<?= e($imgBack) ?>'); background-size: <?= e(css_val($game["image_size"], "cover")) ?>; background-position: <?= e(css_val($game["image_position"], "center")) ?>;"
                         <?php endif; ?>
                     >
 
@@ -212,9 +218,11 @@
                         </span>
                         <?php endif; ?>
 
+                        <?php if ($imgFront): ?>
                         <div class="game-title">
-                            <?= e(mb_strtoupper($game["name"], "UTF-8")) ?>
+                            <img class="game-logo" src="<?= e($imgFront) ?>" alt="<?= e($game["name"]) ?>">
                         </div>
+                        <?php endif; ?>
 
                     </div>
 
@@ -231,6 +239,12 @@
                     <?php endif; ?>
 
                 </a>
+
+                <?php if (is_admin($user)): ?>
+                <a class="edit-button" href="edit-game.php?id=<?= (int)$game["id"] ?>" title="Edit game">✎ Edit</a>
+                <?php endif; ?>
+
+                </div>
 
                 <?php endwhile; ?>
 
