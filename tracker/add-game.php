@@ -1,9 +1,10 @@
 <?php
 
     include("auth.php");
-    $user = require_admin($conn);
+    $user = require_editor($conn);
 
-    $values = ["title" => "", "tags" => "", "image" => ""];
+    $values = ["title" => "", "tags" => [], "image" => ""];
+    $allTags = all_tags($conn);
     $error  = "";
     $saved  = false;
 
@@ -18,14 +19,15 @@
         }
 
         if (!$error) {
-            $tags  = $values["tags"]  === "" ? null : $values["tags"];
             $image = $values["image"] === "" ? null : $values["image"];
 
             try {
                 $stmt = mysqli_prepare($conn,
-                    "INSERT INTO games (name, genre, image_back) VALUES (?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "sss", $values["title"], $tags, $image);
+                    "INSERT INTO games (name, image_back) VALUES (?, ?)");
+                mysqli_stmt_bind_param($stmt, "ss", $values["title"], $image);
                 mysqli_stmt_execute($stmt);
+
+                save_game_tags($conn, (int)mysqli_insert_id($conn), $values["tags"]);
 
                 header("Location: track.php");
                 exit;

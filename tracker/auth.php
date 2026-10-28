@@ -7,6 +7,14 @@
 
     const AUTH_COOKIE   = "auth_token";
     const AUTH_LIFETIME = 60 * 60 * 24 * 7;   // 7 dní
+    const RESET_LIFETIME = 60 * 60;           // odkaz na obnovu hesla platí 1 hodinu
+
+    // ZMEŇ podľa seba: adresa stránky v odkaze z emailu (bez lomky na konci)
+    const SITE_URL  = "http://localhost/tracker";
+    const MAIL_FROM = "trackerpage@outlook.sk";
+    // true = text každého emailu sa zapíše aj do PHP error logu (xampp/apache/logs/error.log),
+    // aby si na localhoste videl odkaz aj bez nastaveného SMTP. Na ostrom serveri daj false.
+    const MAIL_DEV_LOG = true;
 
 
     /* ---------- CSRF ---------- */
@@ -118,11 +126,17 @@
 
     /* ---------- Admin / správa hier ---------- */
 
+    // admin = najvyššia rola: robí všetko vrátane správy používateľov (users.php)
     function is_admin($user) {
         return $user && ($user["role"] ?? "user") === "admin";
     }
 
-    // Stránka je len pre admina: hosť -> login, bežný user -> 403
+    // editor aj admin: smú pridávať, upravovať a mazať hry
+    function is_editor($user) {
+        return $user && in_array($user["role"] ?? "user", ["editor", "admin"], true);
+    }
+
+    // Stránka je len pre admina (správa používateľov): hosť -> login, ostatní -> 403
     function require_admin($conn) {
         $u = current_user($conn);
         if (!$u) {
@@ -130,6 +144,20 @@
             exit;
         }
         if (!is_admin($u)) {
+            http_response_code(403);
+            die("Access denied.");
+        }
+        return $u;
+    }
+
+    // Stránka pre editora aj admina (správa hier): hosť -> login, bežný user -> 403
+    function require_editor($conn) {
+        $u = current_user($conn);
+        if (!$u) {
+            header("Location: login.php");
+            exit;
+        }
+        if (!is_editor($u)) {
             http_response_code(403);
             die("Access denied.");
         }
@@ -146,8 +174,9 @@
     function game_input() {
         return [
             "title" => trim($_POST["title"] ?? ""),
-            "tags"  => trim($_POST["tags"]  ?? ""),
+            "tags"  => tag_ids_input($_POST["tags"] ?? []),
             "image" => trim($_POST["image"] ?? ""),
+            "description" => trim($_POST["description"] ?? ""),
         ];
     }
 
@@ -155,11 +184,169 @@
     function game_validate($v) {
         if ($v["title"] === "")                     return "Game title is required.";
         if (mb_strlen($v["title"], "UTF-8") > 100)  return "Game title is too long (max 100 characters).";
-        if (mb_strlen($v["tags"], "UTF-8") > 100)   return "Tags are too long (max 100 characters).";
+        if (mb_strlen($v["description"], "UTF-8") > 2000) return "Description is too long (max 2000 characters).";
         if ($v["image"] !== "" && !valid_image_src($v["image"])) {
             return "Img source must be an https:// link or a file path like img/game.png.";
         }
         return "";
+    }
+
+    // URL hlavnej stránky so zachovaným filtrom (view), tagom (tag) a triedením (sort)
+    function track_url($view = "all", $sort = "az", $tag = 0) {
+        $q = [];
+        if ($view !== "all") { $q["view"] = $view; }
+        if ($tag)            { $q["tag"]  = (int)$tag; }
+        if ($sort !== "az")  { $q["sort"] = $sort; }
+        return "track.php" . ($q ? "?" . http_build_query($q) : "");
+    }
+
+
+    /* ---------- Tagy ---------- */
+
+    // Z $_POST["tags"] (pole checkboxov) spraví pole unikátnych kladných čísel
+    function tag_ids_input($raw) {
+        if (!is_array($raw)) {
+            return [];
+        }
+        $ids = [];
+        foreach ($raw as $v) {
+            $n = filter_var($v, FILTER_VALIDATE_INT);
+            if ($n !== false && $n > 0) {
+                $ids[$n] = $n;
+            }
+        }
+        return array_values($ids);
+    }
+
+    // Všetky tagy aj s počtom hier: [["id", "name", "games"], ...]
+    function all_tags($conn) {
+        $res = mysqli_query($conn,
+            "SELECT t.id, t.name, COUNT(gt.game_id) AS games
+               FROM tags t
+               LEFT JOIN game_tags gt ON gt.tag_id = t.id
+              GROUP BY t.id, t.name
+              ORDER BY t.id");
+        return mysqli_fetch_all($res, MYSQLI_ASSOC);
+    }
+
+    // Tagy jednej hry: [["id", "name"], ...]
+    function game_tags($conn, $gameId) {
+        $stmt = mysqli_prepare($conn,
+            "SELECT t.id, t.name
+               FROM game_tags gt
+               JOIN tags t ON t.id = gt.tag_id
+              WHERE gt.game_id = ?
+              ORDER BY t.id");
+        mysqli_stmt_bind_param($stmt, "i", $gameId);
+        mysqli_stmt_execute($stmt);
+        return mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+    }
+
+    // Nahradí tagy hry vybranými (neexistujúce id sa ticho ignorujú)
+    function save_game_tags($conn, $gameId, $tagIds) {
+        $stmt = mysqli_prepare($conn, "DELETE FROM game_tags WHERE game_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $gameId);
+        mysqli_stmt_execute($stmt);
+
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO game_tags (game_id, tag_id) SELECT ?, id FROM tags WHERE id = ?");
+        foreach ($tagIds as $tagId) {
+            $tagId = (int)$tagId;
+            mysqli_stmt_bind_param($stmt, "ii", $gameId, $tagId);
+            mysqli_stmt_execute($stmt);
+        }
+    }
+
+    // Zaškrtávacie tagy pre formulár (add / edit). $selected = pole id tagov.
+    function tag_picker($allTags, $selected) {
+        $html = '<div class="tag-picker">';
+        foreach ($allTags as $t) {
+            $checked = in_array((int)$t["id"], array_map("intval", $selected), true) ? " checked" : "";
+            $html .= '<label class="tag-option"><input type="checkbox" name="tags[]" value="'
+                   . (int)$t["id"] . '"' . $checked . '><span>' . e($t["name"]) . '</span></label>';
+        }
+        return $html . '</div>';
+    }
+
+    /* ---------- Jednorazové hlášky (flash) ---------- */
+
+    function flash($type, $msg) {
+        $_SESSION["flash"] = [$type, $msg];
+    }
+
+    // Vráti [typ, text] alebo null a hlášku zároveň zmaže
+    function pull_flash() {
+        $f = $_SESSION["flash"] ?? null;
+        unset($_SESSION["flash"]);
+        return $f;
+    }
+
+
+    /* ---------- Email ---------- */
+
+    function send_mail($to, $subject, $body) {
+        if (MAIL_DEV_LOG) {
+            error_log("[tracker mail] To: " . $to . " | " . $subject . "\n" . $body);
+        }
+        $headers = [
+            "From: " . MAIL_FROM,
+            "MIME-Version: 1.0",
+            "Content-Type: text/plain; charset=UTF-8",
+        ];
+        return @mail($to, mb_encode_mimeheader($subject, "UTF-8"), $body, implode("\r\n", $headers));
+    }
+
+
+    /* ---------- Obnova hesla ---------- */
+
+    // Vytvorí token a vráti ho (v DB je len jeho SHA-256 hash).
+    // Vráti null, ak sa o obnovu pre tohto používateľa žiadalo pred menej ako minútou.
+    function create_password_reset($conn, $userId) {
+        $stmt = mysqli_prepare($conn,
+            "SELECT 1 FROM password_resets
+              WHERE user_id = ? AND used = 0
+                AND expires_at > DATE_ADD(NOW(), INTERVAL " . (RESET_LIFETIME - 60) . " SECOND)
+              LIMIT 1");
+        mysqli_stmt_bind_param($stmt, "i", $userId);
+        mysqli_stmt_execute($stmt);
+        if (mysqli_fetch_row(mysqli_stmt_get_result($stmt))) {
+            return null;
+        }
+
+        // staré odkazy prestanú platiť
+        $stmt = mysqli_prepare($conn, "DELETE FROM password_resets WHERE user_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $userId);
+        mysqli_stmt_execute($stmt);
+
+        $token = bin2hex(random_bytes(32));
+        $hash  = hash("sha256", $token);
+
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO password_resets (user_id, token, expires_at)
+             VALUES (?, ?, DATE_ADD(NOW(), INTERVAL " . RESET_LIFETIME . " SECOND))");
+        mysqli_stmt_bind_param($stmt, "is", $userId, $hash);
+        mysqli_stmt_execute($stmt);
+
+        return $token;
+    }
+
+    // Vráti ["id", "user_id"] pre platný, nepoužitý token, inak null
+    function find_password_reset($conn, $token) {
+        if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+            return null;
+        }
+        $hash = hash("sha256", $token);
+
+        $stmt = mysqli_prepare($conn,
+            "SELECT r.id, r.user_id
+               FROM password_resets r
+               JOIN users u ON u.id = r.user_id
+              WHERE r.token = ? AND r.used = 0 AND r.expires_at > NOW() AND u.is_active = 1
+              LIMIT 1");
+        mysqli_stmt_bind_param($stmt, "s", $hash);
+        mysqli_stmt_execute($stmt);
+
+        return mysqli_fetch_assoc(mysqli_stmt_get_result($stmt)) ?: null;
     }
 
     function e($s) {

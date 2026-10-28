@@ -9,6 +9,7 @@
 
     $error = "";
     $username = "";
+    $notice = pull_flash();     // napr. "Heslo bolo zmenené" po obnove hesla
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -70,8 +71,16 @@
             <input type="password" id="pass" name="pass"
                    placeholder="Enter your password" required>
 
+            <div class="auth-forgot">
+                <a href="forgot-password.php">Forgot password?</a>
+            </div>
+
             <button type="submit" class="auth-submit">LOGIN</button>
         </form>
+
+        <?php if ($notice): ?>
+            <div class="auth-message ok"><?= e($notice[1]) ?></div>
+        <?php endif; ?>
 
         <?php if ($error): ?>
             <div class="auth-message"><?= e($error) ?></div>

@@ -9,7 +9,7 @@
 
     if ($id) {
         $stmt = mysqli_prepare($conn,
-            "SELECT id, name, genre, image_back, image_front, image_size, image_position, description FROM games WHERE id = ? LIMIT 1");
+            "SELECT id, name, image_back, image_front, image_size, image_position, description FROM games WHERE id = ? LIMIT 1");
         mysqli_stmt_bind_param($stmt, "i", $id);
         mysqli_stmt_execute($stmt);
         $game = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
@@ -18,6 +18,8 @@
     if (!$game) {
         http_response_code(404);
     }
+
+    $gameTags = $game ? game_tags($conn, (int)$game["id"]) : [];
 
     $imgBack  = $game ? img_url($game["image_back"])  : "";
     $imgFront = $game ? img_url($game["image_front"]) : "";
@@ -89,8 +91,12 @@
 
                     <h1><?= e($game["name"]) ?></h1>
 
-                    <?php if ($game["genre"]): ?>
-                        <div class="game-detail-genre"><?= e($game["genre"]) ?></div>
+                    <?php if ($gameTags): ?>
+                        <div class="game-tags">
+                            <?php foreach ($gameTags as $t): ?>
+                                <a class="tag-chip" href="<?= e(track_url("all", "az", $t["id"])) ?>"><?= e($t["name"]) ?></a>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
 
                     <h2>About this game</h2>
@@ -100,6 +106,11 @@
                             ? nl2br(e($game["description"]))
                             : "No description yet." ?>
                     </p>
+
+                    <?php if (is_editor($user)): ?>
+                    <a href="edit-game.php?id=<?= (int)$game["id"] ?>"
+                       class="account-button edit-game-link">✎ EDIT GAME</a>
+                    <?php endif; ?>
 
                 </div>
 

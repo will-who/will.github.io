@@ -1,7 +1,7 @@
 <?php
     // Spoločný formulár pre add-game.php a edit-game.php
     // Očakáva: $formTitle, $formSubtitle, $formAction, $submitLabel, $autosave,
-    //          $values (title, tags, image), $error, $saved
+    //          $values (title, tags = pole id, image), $allTags, $error, $saved
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,10 +28,8 @@
                    placeholder="e.g. Apex Legends"
                    value="<?= e($values["title"]) ?>" required>
 
-            <label for="tags">Tags</label>
-            <input type="text" id="tags" name="tags" maxlength="100"
-                   placeholder="e.g. First person shooter"
-                   value="<?= e($values["tags"]) ?>">
+            <label>Tags</label>
+            <?= tag_picker($allTags, $values["tags"]) ?>
 
             <label for="image">Img source</label>
             <input type="text" id="image" name="image" maxlength="500"

@@ -1325,3 +1325,475 @@ a.game-card:hover .game-image {
         width: 180px;
     }
 }
+
+
+/* =========================================================
+   SORT, FAVORITES, SIDEBAR LINKS
+========================================================= */
+
+.sort-option {
+    background: #282c34;
+    color: #e2e4e8;
+    padding: 10px 14px;
+    border-radius: 5px;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.sort-option:hover {
+    background: #343943;
+    color: white;
+}
+
+.sort-option.active {
+    background: #3b3f48;
+    color: white;
+    font-weight: bold;
+}
+
+a.menu-item {
+    text-decoration: none;
+}
+
+a.menu-item:hover {
+    background: #181f2a;
+    color: white;
+}
+
+a.menu-item.selected:hover {
+    background: #202936;
+}
+
+/* Hviezdička (tlačidlo) – pozícia ľavý horný roh karty */
+button.star {
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 3;
+}
+
+button.star:hover {
+    background: #1c2b36;
+}
+
+.empty-state {
+    color: #9ea5af;
+    font-size: 15px;
+}
+
+.edit-game-link {
+    margin-top: 28px;
+}
+
+
+/* =========================================================
+   EDIT GAME PAGE
+========================================================= */
+
+.edit-form label {
+    display: block;
+    margin: 18px 0 6px;
+    color: #9da3ad;
+    font-size: 13px;
+}
+
+.edit-form label:first-child {
+    margin-top: 0;
+}
+
+.edit-form input,
+.edit-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #373d48;
+    border-radius: 4px;
+    outline: none;
+    background: #151922;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    transition: border 0.2s;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+    border-color: #686b70;
+}
+
+.edit-form input.edit-title {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.edit-form textarea {
+    min-height: 170px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.edit-save {
+    max-width: 200px;
+    margin-top: 20px;
+}
+
+.edit-status {
+    min-height: 18px;
+    margin-top: 14px;
+    color: #ff7272;
+    font-size: 13px;
+}
+
+.edit-status.ok {
+    color: #7cff00;
+}
+
+.edit-status.muted {
+    color: #9299a5;
+}
+
+.danger-zone {
+    margin-top: 36px;
+    padding-top: 18px;
+    border-top: 1px solid #2b3039;
+}
+
+.danger-zone summary {
+    cursor: pointer;
+    color: #ff7272;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.danger-zone p {
+    margin: 12px 0;
+    color: #9ea5af;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.danger-button {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 4px;
+    background: #7a2b2b;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.danger-button:hover {
+    background: #9a3535;
+}
+
+
+/* =========================================================
+   SORT DROPDOWN (bez JS, cez <details>)
+========================================================= */
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    cursor: pointer;
+    min-width: 130px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    background: #282c34;
+    color: #e2e4e8;
+    font-size: 15px;
+    user-select: none;
+}
+
+.dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Šípka nakreslená cez CSS (namiesto znaku) */
+.dropdown summary::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin: -3px 0 0 14px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.dropdown[open] summary::after {
+    margin-top: 3px;
+    transform: rotate(-135deg);
+}
+
+.dropdown summary:hover,
+.dropdown[open] summary {
+    background: #343943;
+    color: white;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 100%;
+    z-index: 20;
+    overflow: hidden;
+    border: 1px solid #3a3e47;
+    border-radius: 5px;
+    background: #282c34;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 14px;
+    color: #c6cad1;
+    font-size: 15px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+    background: #343943;
+    color: white;
+}
+
+.dropdown-menu a.active {
+    color: white;
+    font-weight: bold;
+    background: #202936;
+}
+
+
+/* =========================================================
+   TAGS
+========================================================= */
+
+/* Sidebar: nadpis sekcie s tagmi */
+.menu-title {
+    padding: 0 17px 8px;
+    color: #737a86;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tag-menu {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid #2b3039;
+}
+
+/* Admin formulár: výber tagov (zaškrtávacie "pilulky") */
+.tag-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.edit-form .edit-label {
+    display: block;
+    margin: 18px 0 6px;
+    color: #9da3ad;
+    font-size: 13px;
+}
+
+.edit-form .tag-picker label.tag-option,
+.auth-box .tag-picker label.tag-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 12px;
+    border: 1px solid #373d48;
+    border-radius: 999px;
+    background: #151922;
+    color: #c6cad1;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border 0.2s, background 0.2s;
+}
+
+.edit-form .tag-picker label.tag-option:hover,
+.auth-box .tag-picker label.tag-option:hover {
+    border-color: #686b70;
+}
+
+.edit-form .tag-picker input,
+.auth-box .tag-picker input {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    accent-color: #4c8bf5;
+    cursor: pointer;
+}
+
+.auth-box .tag-picker label.tag-option span {
+    color: inherit;
+}
+
+.tag-picker label.tag-option:has(input:checked) {
+    background: #202936;
+    border-color: #686b70;
+    color: white;
+}
+
+/* Stránka hry: tagy ako odkazy */
+.game-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tag-chip {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #202833;
+    color: #d8dce2;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.tag-chip:hover {
+    background: #2b3544;
+    color: white;
+}
+
+
+/* =========================================================
+   FORGOT PASSWORD + ALL USERS
+========================================================= */
+
+.auth-forgot {
+    margin: -8px 0 18px;
+    text-align: right;
+    font-size: 13px;
+}
+
+.auth-forgot a {
+    color: #858c97;
+    text-decoration: none;
+}
+
+.auth-forgot a:hover {
+    color: white;
+}
+
+/* Ikonka "All users" vedľa zvončeka (odkaz vyzerá ako tlačidlo zvončeka) */
+a.notification {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.flash-msg {
+    max-width: 1000px;
+    margin-top: 18px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.flash-msg.ok {
+    background: #12261a;
+    color: #7cff00;
+}
+
+.flash-msg.error {
+    background: #2a1517;
+    color: #ff7272;
+}
+
+.users-table-wrap {
+    margin-top: 24px;
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    max-width: 1000px;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.users-table th {
+    padding: 10px 14px;
+    border-bottom: 1px solid #2b3039;
+    color: #9da3ad;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.users-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #20262f;
+    color: #d8dce2;
+    white-space: nowrap;
+}
+
+.users-table tr.me td {
+    background: #181f2a;
+}
+
+.users-table form {
+    margin: 0;
+}
+
+.users-action {
+    text-align: right;
+}
+
+.users-table .account-button {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
+.account-button.danger {
+    border-color: #6b2b2b;
+    color: #ff8a8a;
+}
+
+.account-button.danger:hover {
+    background: #3a1d1f;
+    border-color: #8a3a3a;
+    color: white;
+}
+
+.you-label {
+    margin-left: 6px;
+    color: #737a86;
+    font-size: 12px;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #202833;
+    color: #bfc4cc;
+    font-size: 12px;
+}
+
+.role-badge.editor {
+    background: #202936;
+    color: white;
+}
+
+.role-badge.admin {
+    background: #3a2f12;
+    color: #ffd166;
+}
