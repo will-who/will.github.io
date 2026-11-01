@@ -599,7 +599,7 @@ h1 {
 
     position: absolute;
 
-    top: 5px;
+    top: 41px;
 
     left: 5px;
 
@@ -1796,4 +1796,317 @@ a.notification {
 .role-badge.admin {
     background: #3a2f12;
     color: #ffd166;
+}
+
+
+/* =========================================================
+   RATINGS
+========================================================= */
+
+/* Priemerné hodnotenie v ľavom hornom rohu obrázka hry */
+.rating-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 2;
+    height: 31px;
+    padding: 0 9px;
+    display: flex;
+    align-items: center;
+    background: #101b22;
+    border-radius: 5px;
+    color: #ffd000;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.rating-badge.none {
+    color: #888;
+}
+
+.game-detail-image {
+    position: relative;
+}
+
+.rating-summary {
+    margin-top: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.rating-big {
+    color: #ffd000;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.rating-meta {
+    color: #9ea5af;
+    font-size: 14px;
+}
+
+.rating-meta a {
+    color: #d8dce2;
+}
+
+.rate-box {
+    margin-top: 12px;
+}
+
+.rate-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* tlačidlá sú v HTML od 5 po 1, vizuálne sa zobrazia 1..5 (zľava doprava) */
+.rate-stars {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.rate-star {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+    padding: 0 2px;
+    color: #4a505b;
+}
+
+.rate-star.on {
+    color: #ffd000;
+}
+
+.rate-stars:hover .rate-star {
+    color: #4a505b;
+}
+
+.rate-stars .rate-star:hover,
+.rate-stars .rate-star:hover ~ .rate-star {
+    color: #ffd000;
+}
+
+.rate-remove {
+    background: none;
+    border: none;
+    color: #858c97;
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+.rate-remove:hover {
+    color: white;
+}
+
+/* =========================================================
+   NEWS
+========================================================= */
+
+.news {
+    margin-bottom: 34px;
+}
+
+.news-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.news-header h2 {
+    font-size: 18px;
+    color: #e7e9ed;
+}
+
+.news-manage {
+    color: #9ea5af;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.news-manage:hover {
+    color: white;
+}
+
+.news-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.news-card {
+    flex: 1 1 220px;
+    max-width: 300px;
+    background: #161c27;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.news-image {
+    height: 150px;
+    background: #2b3039 center / cover no-repeat;
+}
+
+.news-body {
+    padding: 12px 14px 14px;
+}
+
+.news-body h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.news-body p {
+    color: #9ea5af;
+    font-size: 13px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.news-body small {
+    display: block;
+    margin-top: 10px;
+    color: #6f7783;
+    font-size: 12px;
+}
+
+/* sivé placeholdery, kým nie sú pridané žiadne novinky */
+.ph-line {
+    height: 10px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background: #2b3039;
+}
+
+.ph-title {
+    height: 14px;
+    width: 70%;
+    margin-top: 0;
+}
+
+.ph-short {
+    width: 45%;
+}
+
+/* news.php – správa noviniek */
+.news-form {
+    max-width: 700px;
+    margin-top: 20px;
+    padding: 20px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.news-form h2 {
+    font-size: 18px;
+}
+
+.news-form label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 13px;
+    color: #9ea5af;
+}
+
+.news-form input[type="text"],
+.news-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.news-form textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.news-form-actions {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.news-form-error {
+    margin-top: 14px;
+    color: #ff7272;
+    font-size: 14px;
+}
+
+.news-list-heading {
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.news-list {
+    max-width: 700px;
+    margin-top: 12px;
+}
+
+.news-list-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #222936;
+}
+
+.news-thumb {
+    width: 72px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: #2b3039 center / cover no-repeat;
+}
+
+.news-list-title {
+    flex: 1;
+    min-width: 0;
+}
+
+.news-list-title strong {
+    display: block;
+    font-size: 14px;
+}
+
+.news-list-title small {
+    color: #6f7783;
+    font-size: 12px;
+}
+
+.news-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.news-list-actions a,
+.news-list-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ea5af;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.news-list-actions a:hover,
+.news-list-actions button:hover {
+    color: white;
+}
+
+.news-list-actions button.danger:hover {
+    color: #ff7272;
 }

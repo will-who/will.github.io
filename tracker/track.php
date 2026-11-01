@@ -32,6 +32,10 @@
 
     $sql = "SELECT g.id, g.name, g.image_back, g.image_front, g.image_size, g.image_position,
                    (f.user_id IS NOT NULL) AS is_fav,
+                   (SELECT ROUND(AVG(r.rating), 1) FROM ratings r JOIN users ru ON ru.id = r.user_id
+                     WHERE r.game_id = g.id AND ru.role <> 'admin') AS avg_rating,
+                   (SELECT COUNT(*) FROM ratings r2 JOIN users ru2 ON ru2.id = r2.user_id
+                     WHERE r2.game_id = g.id AND ru2.role <> 'admin') AS rating_count,
                    (SELECT GROUP_CONCAT(t.name ORDER BY t.id SEPARATOR ', ')
                       FROM game_tags gt2 JOIN tags t ON t.id = gt2.tag_id
                      WHERE gt2.game_id = g.id) AS tag_names
@@ -59,7 +63,11 @@
         mysqli_stmt_execute($stmt);
         $favCount = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
     }
-    
+
+    // Novinky (posledné 4)
+    $news = mysqli_fetch_all(mysqli_query($conn,
+        "SELECT id, title, body, image, created_at FROM news ORDER BY created_at DESC, id DESC LIMIT 4"), MYSQLI_ASSOC);
+
 ?>
 
 
@@ -229,6 +237,52 @@
         <main class="content">
 
 
+            <?php if ($view === "all" && !$tag): ?>
+            <section class="news">
+
+                <div class="news-header">
+                    <h2>What's new</h2>
+                    <?php if (is_editor($user)): ?>
+                    <a href="news.php" class="news-manage">✎ Manage news</a>
+                    <?php endif; ?>
+                </div>
+
+                <div class="news-row">
+
+                <?php if ($news): ?>
+
+                    <?php foreach ($news as $n): ?>
+                    <?php $nImg = img_url($n["image"]); ?>
+                    <article class="news-card">
+                        <div class="news-image"<?php if ($nImg): ?> style="background-image: url('<?= e($nImg) ?>');"<?php endif; ?>></div>
+                        <div class="news-body">
+                            <h3><?= e($n["title"]) ?></h3>
+                            <p><?= e($n["body"]) ?></p>
+                            <small><?= e(date("j. n. Y", strtotime($n["created_at"]))) ?></small>
+                        </div>
+                    </article>
+                    <?php endforeach; ?>
+
+                <?php else: ?>
+
+                    <?php for ($i = 0; $i < 4; $i++): ?>
+                    <article class="news-card placeholder">
+                        <div class="news-image"></div>
+                        <div class="news-body">
+                            <div class="ph-line ph-title"></div>
+                            <div class="ph-line"></div>
+                            <div class="ph-line ph-short"></div>
+                        </div>
+                    </article>
+                    <?php endfor; ?>
+
+                <?php endif; ?>
+
+                </div>
+
+            </section>
+            <?php endif; ?>
+
             <div class="content-header">
 
                 <h1>
@@ -312,7 +366,12 @@
                         <?php endif; ?>
                     >
 
-                        
+                        <div class="rating-badge <?= $game["rating_count"] ? "" : "none" ?>"
+                             title="<?= $game["rating_count"]
+                                 ? e(number_format((float)$game["avg_rating"], 1) . " average from " . $game["rating_count"] . " rating(s)")
+                                 : "No ratings yet" ?>">
+                            ★ <?= $game["rating_count"] ? e(number_format((float)$game["avg_rating"], 1)) : "–" ?>
+                        </div>
 
                         <?php if ($imgFront): ?>
                         <div class="game-title">
