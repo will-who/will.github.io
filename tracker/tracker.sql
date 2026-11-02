@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hostiteľ: 127.0.0.1
--- Čas generovania: Po 02.Nov 2026, 09:55
--- Verzia serveru: 10.4.32-MariaDB
--- Verzia PHP: 8.0.30
+-- Host: 127.0.0.1
+-- Generation Time: Nov 02, 2026 at 10:29 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Databáza: `tracker`
+-- Database: `tracker`
 --
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `favorites`
+-- Table structure for table `favorites`
 --
 
 CREATE TABLE `favorites` (
@@ -33,10 +33,17 @@ CREATE TABLE `favorites` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `favorites`
+--
+
+INSERT INTO `favorites` (`user_id`, `game_id`, `created_at`) VALUES
+(9, 9, '2026-11-02 09:27:58');
+
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `games`
+-- Table structure for table `games`
 --
 
 CREATE TABLE `games` (
@@ -53,7 +60,7 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `games`
+-- Dumping data for table `games`
 --
 
 INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_size`, `image_position`, `description`, `created_at`, `updated_at`) VALUES
@@ -69,7 +76,7 @@ INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `game_tags`
+-- Table structure for table `game_tags`
 --
 
 CREATE TABLE `game_tags` (
@@ -78,7 +85,7 @@ CREATE TABLE `game_tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `game_tags`
+-- Dumping data for table `game_tags`
 --
 
 INSERT INTO `game_tags` (`game_id`, `tag_id`) VALUES
@@ -94,7 +101,7 @@ INSERT INTO `game_tags` (`game_id`, `tag_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `news`
+-- Table structure for table `news`
 --
 
 CREATE TABLE `news` (
@@ -106,10 +113,18 @@ CREATE TABLE `news` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `news`
+--
+
+INSERT INTO `news` (`id`, `title`, `body`, `image`, `created_at`, `updated_at`) VALUES
+(1, 'Apex Legends will be great again', 'EPIC NEWS!!!!\r\nNext season lifeline is getting shield revive again', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCdI299kjsJd3wXRHLt15-KsuSQzI8RLX5ODiHEYVaJA&s=10', '2026-11-02 09:21:41', '2026-11-02 09:21:41'),
+(2, 'New deadlock update now has halloween', 'yup', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrMkjc1jDduAhdmMC0tT2H__ihReHSmx_xjfSjfIQyQ&s=10', '2026-11-02 09:22:17', '2026-11-02 09:22:17');
+
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `password_resets`
+-- Table structure for table `password_resets`
 --
 
 CREATE TABLE `password_resets` (
@@ -121,31 +136,41 @@ CREATE TABLE `password_resets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `password_resets`
+-- Dumping data for table `password_resets`
 --
 
 INSERT INTO `password_resets` (`id`, `user_id`, `token`, `expires_at`, `used`) VALUES
-(2, 3, 'b04eced8b1edea991cf64fe74c9bdc53c1492469df138a6b8f7ebf31efd38142', '2026-10-28 10:12:30', 0),
 (3, 4, 'e02d5044f4db474d5c772d521f7af4726bbc17c60cfb033d9a5f18bd6e5844c9', '2026-10-28 10:27:00', 0);
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `ratings`
+-- Table structure for table `ratings`
 --
 
 CREATE TABLE `ratings` (
   `user_id` int(10) UNSIGNED NOT NULL,
   `game_id` int(10) UNSIGNED NOT NULL,
   `rating` tinyint(3) UNSIGNED NOT NULL CHECK (`rating` between 1 and 5),
+  `comment` varchar(1000) NOT NULL DEFAULT '',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `ratings`
+--
+
+INSERT INTO `ratings` (`user_id`, `game_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
+(7, 3, 2, 'The game has potential to be great again, but as we know EA, they will only ruin it more', '2026-11-02 09:18:21', '2026-11-02 09:18:21'),
+(7, 9, 1, 'Cancer-causing game!!!!!\r\nI really don\'t reccommend this game, my son was playing this game and got leucemia because of this brain-rotting piece of sh*t. He was playing it 110 hours per week, it really hurt his hair structure because of the headphones', '2026-11-02 09:26:13', '2026-11-02 09:26:13'),
+(9, 3, 4, 'I only appreciate gambling mechanics', '2026-11-02 09:19:46', '2026-11-02 09:19:46'),
+(9, 9, 5, 'I LOVE THIS GAME IS MY FAVORITE IM GOLD 2, I LOVE EKITTENS UwU\r\n-posp', '2026-11-02 09:27:18', '2026-11-02 09:27:18');
+
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `sessions` (
@@ -157,10 +182,17 @@ CREATE TABLE `sessions` (
   `expires_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
+(20, 9, 'e1ab5dfbb4503b7aca4721ab5d6c776776d939d79752fe5d5d58e13bfc933993', '::1', '2026-11-02 09:26:33', '2026-11-09 10:26:33');
+
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `tags`
+-- Table structure for table `tags`
 --
 
 CREATE TABLE `tags` (
@@ -169,7 +201,7 @@ CREATE TABLE `tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `tags`
+-- Dumping data for table `tags`
 --
 
 INSERT INTO `tags` (`id`, `name`) VALUES
@@ -180,7 +212,7 @@ INSERT INTO `tags` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -195,47 +227,47 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_active`, `created_at`, `last_login`) VALUES
-(2, 'editor', 'luboslav.berny@gmail.com', '$2y$10$qf32sXFmHAtjP/O9FgvcMOfqad/0jgp3ZzBo9nIDppsD6Oyqp4Z9.', 'editor', 1, '2026-10-27 10:30:17', '2026-10-27 12:59:09'),
-(3, 'user', 'amaha1337@centrum.sk', '$2y$10$zQ0pmSI4bAO8z5EX4rhOPOJUua/k.7ORxFEhQ7LMLulPOpFGruMoS', 'user', 1, '2026-10-27 12:54:13', '2026-10-27 12:54:13'),
-(4, 'admin', 'lubkobernhauser2@gmail.com', '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-10-28 08:09:12');
+(4, 'admin', 'lubkobernhauser2@gmail.com', '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-02 09:20:07'),
+(7, 'user', 'amaha1337@centrum.sk', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'user', 1, '2026-11-02 09:05:58', '2026-11-02 09:23:28'),
+(9, 'user2', 'luboslav.berny@gmail.com', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'user', 1, '2026-11-02 09:19:08', '2026-11-02 09:26:33');
 
 --
--- Kľúče pre exportované tabuľky
+-- Indexes for dumped tables
 --
 
 --
--- Indexy pre tabuľku `favorites`
+-- Indexes for table `favorites`
 --
 ALTER TABLE `favorites`
   ADD PRIMARY KEY (`user_id`,`game_id`),
   ADD KEY `idx_favorites_game` (`game_id`);
 
 --
--- Indexy pre tabuľku `games`
+-- Indexes for table `games`
 --
 ALTER TABLE `games`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_games_name` (`name`);
 
 --
--- Indexy pre tabuľku `game_tags`
+-- Indexes for table `game_tags`
 --
 ALTER TABLE `game_tags`
   ADD PRIMARY KEY (`game_id`,`tag_id`),
   ADD KEY `idx_game_tags_tag` (`tag_id`);
 
 --
--- Indexy pre tabuľku `news`
+-- Indexes for table `news`
 --
 ALTER TABLE `news`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexy pre tabuľku `password_resets`
+-- Indexes for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`id`),
@@ -243,14 +275,14 @@ ALTER TABLE `password_resets`
   ADD KEY `fk_resets_user` (`user_id`);
 
 --
--- Indexy pre tabuľku `ratings`
+-- Indexes for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`user_id`,`game_id`),
   ADD KEY `idx_ratings_game` (`game_id`);
 
 --
--- Indexy pre tabuľku `sessions`
+-- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`),
@@ -258,14 +290,14 @@ ALTER TABLE `sessions`
   ADD KEY `idx_sessions_user` (`user_id`);
 
 --
--- Indexy pre tabuľku `tags`
+-- Indexes for table `tags`
 --
 ALTER TABLE `tags`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_tags_name` (`name`);
 
 --
--- Indexy pre tabuľku `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -273,78 +305,78 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `uq_users_email` (`email`);
 
 --
--- AUTO_INCREMENT pre exportované tabuľky
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pre tabuľku `games`
+-- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT pre tabuľku `news`
+-- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT pre tabuľku `password_resets`
+-- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT pre tabuľku `sessions`
+-- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT pre tabuľku `tags`
+-- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT pre tabuľku `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- Obmedzenie pre exportované tabuľky
+-- Constraints for dumped tables
 --
 
 --
--- Obmedzenie pre tabuľku `favorites`
+-- Constraints for table `favorites`
 --
 ALTER TABLE `favorites`
   ADD CONSTRAINT `fk_favorites_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `game_tags`
+-- Constraints for table `game_tags`
 --
 ALTER TABLE `game_tags`
   ADD CONSTRAINT `fk_game_tags_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_game_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `password_resets`
+-- Constraints for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD CONSTRAINT `fk_resets_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `ratings`
+-- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD CONSTRAINT `fk_ratings_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_ratings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `sessions`
+-- Constraints for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
