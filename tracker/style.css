@@ -2508,3 +2508,35 @@ a.news-card:hover .news-readmore {
     color: white;
     text-decoration: underline;
 }
+
+
+
+/* Aktuálne meno a email navrchu nastavení */
+.settings-info {
+    max-width: 700px;
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: #161c27;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-info div {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+}
+
+.settings-info span {
+    flex: 0 0 90px;
+    color: #6f7783;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.settings-info strong {
+    color: #e8ebf0;
+    font-size: 15px;
+}

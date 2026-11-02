@@ -10,7 +10,7 @@
 
     $uid = (int)$user["id"];
 
-    $values = ["username" => $user["username"], "email" => $user["email"]];
+    $values = ["username" => "", "email" => ""];   // polia ostávajú prázdne (nič sa nedopĺňa)
     $errors = ["username" => "", "email" => "", "password" => ""];
 
     // Overí aktuálne heslo prihláseného používateľa
@@ -199,6 +199,11 @@
             <div class="flash-msg <?= $flash[0] === "ok" ? "ok" : "error" ?>"><?= e($flash[1]) ?></div>
         <?php endif; ?>
 
+        <div class="settings-info">
+            <div><span>USERNAME</span><strong><?= e($user["username"]) ?></strong></div>
+            <div><span>EMAIL</span><strong><?= e($user["email"]) ?></strong></div>
+        </div>
+
         <!-- Meno -->
         <form method="POST" action="settings.php" class="settings-form">
             <?= csrf_field() ?>
@@ -208,11 +213,11 @@
 
             <label for="username">New username</label>
             <input type="text" id="username" name="username" maxlength="50"
-                   autocomplete="username" value="<?= e($values["username"]) ?>" required>
+                   autocomplete="off" placeholder="Enter a new username" value="<?= e($values["username"]) ?>" required>
 
             <label for="current_pass_u">Current password</label>
             <input type="password" id="current_pass_u" name="current_pass"
-                   autocomplete="current-password" required>
+                   autocomplete="new-password" required>
 
             <div class="settings-actions">
                 <button type="submit" class="account-button">CHANGE USERNAME</button>
@@ -232,11 +237,11 @@
 
             <label for="email">New email</label>
             <input type="email" id="email" name="email" maxlength="255"
-                   autocomplete="email" value="<?= e($values["email"]) ?>" required>
+                   autocomplete="off" placeholder="Enter a new email" value="<?= e($values["email"]) ?>" required>
 
             <label for="current_pass_e">Current password</label>
             <input type="password" id="current_pass_e" name="current_pass"
-                   autocomplete="current-password" required>
+                   autocomplete="new-password" required>
 
             <div class="settings-actions">
                 <button type="submit" class="account-button">CHANGE EMAIL</button>
@@ -256,7 +261,7 @@
 
             <label for="current_pass_p">Current password</label>
             <input type="password" id="current_pass_p" name="current_pass"
-                   autocomplete="current-password" required>
+                   autocomplete="new-password" required>
 
             <label for="new_pass">New password</label>
             <input type="password" id="new_pass" name="new_pass"
