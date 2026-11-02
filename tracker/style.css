@@ -2412,3 +2412,99 @@ a.news-card.has-game:hover {
 .settings-actions {
     margin-top: 18px;
 }
+
+
+/* =========================================================
+   NEWS – samostatná stránka (article.php)
+========================================================= */
+
+a.news-card {
+    cursor: pointer;
+}
+
+.news-article {
+    max-width: 800px;
+}
+
+.news-article-image {
+    height: 320px;
+    margin-bottom: 22px;
+    border-radius: 6px;
+    background: #2b3039 center / cover no-repeat;
+}
+
+.news-article-meta {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #6f7783;
+    font-size: 13px;
+}
+
+.news-article-text {
+    margin-top: 22px;
+    color: #d8dce2;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.news-article-game {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 420px;
+    margin-top: 30px;
+    padding: 12px;
+    background: #161c27;
+    border-radius: 6px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.news-article-game:hover {
+    background: #1b2332;
+}
+
+.news-article-game-img {
+    flex: 0 0 64px;
+    height: 86px;
+    border-radius: 4px;
+    background: #2b3039 center / cover no-repeat;
+}
+
+.news-article-game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.news-article-game-info small {
+    color: #6f7783;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.news-article-game-info strong {
+    font-size: 16px;
+}
+
+.news-article-game-info span {
+    color: #9ea5af;
+    font-size: 13px;
+}
+
+
+/* "Read more" pod dátumom na karte novinky */
+.news-readmore {
+    display: inline-block;
+    margin-top: 8px;
+    color: #aeb3bd;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+a.news-card:hover .news-readmore {
+    color: white;
+    text-decoration: underline;
+}

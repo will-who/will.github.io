@@ -272,7 +272,7 @@
 
                     <?php foreach ($news as $n): ?>
                     <?php $nImg = img_url($n["image"]); ?>
-                    <<?= $n["game_id"] ? 'a href="game.php?id=' . (int)$n["game_id"] . '"' : 'article' ?> class="news-card<?= $n["game_id"] ? " has-game" : "" ?>">
+                    <a href="article.php?id=<?= (int)$n["id"] ?>" class="news-card has-game">
                         <div class="news-image"<?php if ($nImg): ?> style="background-image: url('<?= e($nImg) ?>');"<?php endif; ?>></div>
                         <div class="news-body">
                             <h3><?= e($n["title"]) ?></h3>
@@ -281,8 +281,9 @@
                             <span class="news-game">🎮 <?= e($n["game_name"]) ?></span>
                             <?php endif; ?>
                             <small><?= e(date("j. n. Y H:i", strtotime($n["created_at"]))) ?></small>
+                            <span class="news-readmore">Read more →</span>
                         </div>
-                    </<?= $n["game_id"] ? 'a' : 'article' ?>>
+                    </a>
                     <?php endforeach; ?>
 
                 <?php else: ?>
