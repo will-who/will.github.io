@@ -127,6 +127,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="fav.jpg">
     <title>Edit game – <?= e($game["name"]) ?></title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
@@ -135,6 +136,8 @@
 
     <header class="topbar">
 
+        <a href="track.php" class="logo-link"><img src="logo.jpg" alt="Logo" class="topbar-logo"></a>
+
         <nav>
             <a href="track.php" class="active">HOME</a>
             <a href="#">FRIENDS</a>
@@ -142,6 +145,8 @@
         </nav>
 
         <div class="topbar-right">
+
+            <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
             <span class="username"><?= e($user["username"]) ?></span>
 

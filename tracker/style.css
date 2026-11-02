@@ -2371,3 +2371,44 @@ a.news-card.has-game:hover {
     object-fit: cover;
     display: block;
 }
+
+
+/* =========================================================
+   SETTINGS (settings.php)
+========================================================= */
+
+.settings-form {
+    max-width: 700px;
+    margin-top: 20px;
+    padding: 20px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.settings-form h2 {
+    font-size: 18px;
+}
+
+.settings-form label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 13px;
+    color: #9ea5af;
+}
+
+.settings-form input[type="text"],
+.settings-form input[type="email"],
+.settings-form input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.settings-actions {
+    margin-top: 18px;
+}

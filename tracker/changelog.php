@@ -27,6 +27,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="fav.jpg">
     <title>Change log – Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
@@ -34,6 +35,8 @@
 <body>
 
     <header class="topbar">
+
+        <a href="track.php" class="logo-link"><img src="logo.jpg" alt="Logo" class="topbar-logo"></a>
 
         <nav>
             <a href="track.php">HOME</a>
@@ -48,6 +51,8 @@
             <?php if (is_admin($user)): ?>
             <a href="users.php" class="notification users-link" title="All users">👥</a>
             <?php endif; ?>
+
+            <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
             <span class="username"><?= e($user["username"]) ?></span>
 

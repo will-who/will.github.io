@@ -87,7 +87,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/jpeg" href="fav.jpg">
-    <title>LuLo Tracker</title>
+    <title>Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
 
@@ -134,6 +134,8 @@
             </button>
 
             <?php if ($user): ?>
+
+                <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
                 <span class="username"><?= e($user["username"]) ?></span>
 
