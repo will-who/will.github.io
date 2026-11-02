@@ -201,6 +201,14 @@
     }
 
 
+    // Kam vedie "Back to games": posledný zoznam hier (filter, tag, triedenie) a karta danej hry.
+    // Server nevie, ako ďaleko máš odscrollované, preto ťa vráti na kartu hry (kotva #game-ID).
+    function back_url($gameId = 0) {
+        $url = $_SESSION["list_url"] ?? "track.php";
+        return $url . ($gameId ? "#game-" . (int)$gameId : "");
+    }
+
+
     /* ---------- Tagy ---------- */
 
     // Z $_POST["tags"] (pole checkboxov) spraví pole unikátnych kladných čísel
@@ -347,6 +355,33 @@
         mysqli_stmt_execute($stmt);
 
         return mysqli_fetch_assoc(mysqli_stmt_get_result($stmt)) ?: null;
+    }
+
+    /* ---------- Zoznam zmien (changelog) ---------- */
+
+    // Zapíše zmenu do tabuľky changelog. Chyba pri logovaní nikdy neskazí hlavnú akciu.
+    // $action: added / edited / deleted / promoted / demoted, $entity: game / news / user
+    function log_change($conn, $user, $action, $entity, $name, $details = "") {
+        try {
+            $uid   = (int)$user["id"];
+            $uname = (string)$user["username"];
+            $name  = mb_substr((string)$name, 0, 150, "UTF-8");
+            $details = $details === "" ? null : $details;
+            $stmt = mysqli_prepare($conn,
+                "INSERT INTO changelog (user_id, username, action, entity, entity_name, details)
+                 VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "isssss", $uid, $uname, $action, $entity, $name, $details);
+            mysqli_stmt_execute($stmt);
+        }
+        catch (mysqli_sql_exception $ex) {
+            error_log("[tracker changelog] " . $ex->getMessage());
+        }
+    }
+
+    // Skráti dlhý text na zobrazenie v zázname o zmene
+    function log_short($s, $max = 60) {
+        $s = trim(preg_replace('/\s+/', ' ', (string)$s));
+        return mb_strlen($s, "UTF-8") > $max ? mb_substr($s, 0, $max, "UTF-8") . "…" : $s;
     }
 
     function e($s) {

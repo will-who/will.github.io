@@ -3,6 +3,14 @@
     include("auth.php");
     $user = require_admin($conn);
 
+    function user_name_by_id($conn, $id) {
+        $stmt = mysqli_prepare($conn, "SELECT username FROM users WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        mysqli_stmt_execute($stmt);
+        $r = mysqli_fetch_row(mysqli_stmt_get_result($stmt));
+        return $r ? $r[0] : "#" . $id;
+    }
+
     /* ---------- Zmena roly (POST) ---------- */
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,6 +32,7 @@
             mysqli_stmt_execute($stmt);
 
             if (mysqli_stmt_affected_rows($stmt) > 0) {
+                log_change($conn, $user, "promoted", "user", user_name_by_id($conn, $targetId), "now an editor");
                 flash("ok", "User is now an editor.");
             } else {
                 flash("error", "User not found or is already an editor.");
@@ -37,6 +46,7 @@
             mysqli_stmt_execute($stmt);
 
             if (mysqli_stmt_affected_rows($stmt) > 0) {
+                log_change($conn, $user, "demoted", "user", user_name_by_id($conn, $targetId), "editor rights removed");
                 flash("ok", "Editor rights removed.");
             } else {
                 flash("error", "User not found or is not an editor.");
@@ -78,6 +88,7 @@
 
         <div class="topbar-right">
 
+            <a href="changelog.php" class="notification users-link" title="Change log">📜</a>
             <a href="users.php" class="notification users-link active" title="All users">👥</a>
 
             <span class="username"><?= e($user["username"]) ?></span>
@@ -94,7 +105,7 @@
 
     <main class="content">
 
-        <a href="track.php" class="back-link">← Back to games</a>
+        <a href="<?= e(back_url()) ?>" class="back-link">← Back to games</a>
 
         <div class="content-header">
             <h1>All users</h1>

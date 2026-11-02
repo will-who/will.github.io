@@ -9,6 +9,12 @@
         exit;
     }
 
+    // Admin účty nemajú obľúbené hry
+    if (is_admin($user)) {
+        header("Location: track.php");
+        exit;
+    }
+
     $sort   = ($_POST["sort"] ?? "az") === "updated" ? "updated" : "az";
     $view   = ($_POST["view"] ?? "all") === "favorites" ? "favorites" : "all";
     $tag    = filter_input(INPUT_POST, "tag", FILTER_VALIDATE_INT) ?: 0;

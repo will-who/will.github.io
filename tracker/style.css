@@ -2110,3 +2110,249 @@ a.notification {
 .news-list-actions button.danger:hover {
     color: #ff7272;
 }
+
+
+/* =========================================================
+   REVIEWS (hviezdičky + povinný komentár)
+========================================================= */
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.review-form textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 10px 12px;
+    border: 1px solid #373d48;
+    border-radius: 4px;
+    outline: none;
+    background: #151922;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    resize: vertical;
+    transition: border 0.2s;
+}
+
+.review-form textarea:focus {
+    border-color: #686b70;
+}
+
+.review-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Hviezdičky ako radio inputy (poradie v HTML 5 -> 1, zobrazené 1 -> 5) */
+.star-input {
+    position: relative;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.star-input input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.star-input label {
+    padding: 0 2px;
+    color: #4a505b;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.star-input input:checked ~ label {
+    color: #ffd000;
+}
+
+.star-input:hover input ~ label {
+    color: #4a505b;
+}
+
+.star-input:hover label:hover,
+.star-input:hover label:hover ~ label {
+    color: #ffd000;
+}
+
+.star-input input:focus-visible + label {
+    outline: 1px dashed #686b70;
+}
+
+/* Zoznam recenzií */
+.reviews {
+    max-width: 700px;
+    margin-top: 40px;
+}
+
+.review {
+    padding: 16px 0;
+    border-top: 1px solid #2b3039;
+}
+
+.review-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.review-head strong {
+    color: white;
+}
+
+.review-stars {
+    color: #ffd000;
+    letter-spacing: 1px;
+}
+
+.review-head small {
+    color: #737a86;
+}
+
+.review p {
+    margin: 8px 0 0;
+    color: #c6cad1;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.review-delete-form {
+    margin: 0 0 0 auto;
+}
+
+.rate-remove.review-delete:hover {
+    color: #ff7272;
+}
+
+
+/* News: ak sa karty nezmestia na riadok, riadok sa posúva do strán */
+.content {
+    min-width: 0;
+}
+
+.news-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #3a414d #161c27;
+}
+
+.news-card {
+    flex: 1 0 240px;
+    max-width: 300px;
+}
+
+.news-row::-webkit-scrollbar {
+    height: 8px;
+}
+
+.news-row::-webkit-scrollbar-track {
+    background: #161c27;
+    border-radius: 4px;
+}
+
+.news-row::-webkit-scrollbar-thumb {
+    background: #3a414d;
+    border-radius: 4px;
+}
+
+.news-row::-webkit-scrollbar-thumb:hover {
+    background: #4a505b;
+}
+
+
+/* Kotvy (návrat na kartu hry, formulár, recenzie, novinky): kúsok miesta nad cieľom */
+.game-card-wrap,
+.rate-box,
+.reviews,
+.news-list-heading,
+.news-list-item {
+    scroll-margin-top: 20px;
+}
+
+/* =========================================================
+   NEWS – hra v novinke, výber hry; CHANGELOG
+========================================================= */
+
+a.news-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+a.news-card.has-game:hover {
+    background: #1b2332;
+}
+
+.news-game {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #202833;
+    color: #bfc4cc;
+    font-size: 12px;
+}
+
+.news-select {
+    width: 100%;
+    padding: 10px 12px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.changelog-table td.details {
+    white-space: normal;
+    color: #9ea5af;
+    max-width: 480px;
+}
+
+.changelog-table td.when {
+    white-space: nowrap;
+    color: #9da3ad;
+}
+
+.action-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #202833;
+    color: #bfc4cc;
+    font-size: 12px;
+}
+
+.action-badge.added,
+.action-badge.promoted {
+    background: #17301f;
+    color: #7ee2a0;
+}
+
+.action-badge.edited {
+    background: #202936;
+    color: #9cc4ff;
+}
+
+.action-badge.deleted,
+.action-badge.demoted {
+    background: #3a1d1f;
+    color: #ff8a8a;
+}

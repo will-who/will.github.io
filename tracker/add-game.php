@@ -27,7 +27,10 @@
                 mysqli_stmt_bind_param($stmt, "ss", $values["title"], $image);
                 mysqli_stmt_execute($stmt);
 
-                save_game_tags($conn, (int)mysqli_insert_id($conn), $values["tags"]);
+                $newId = (int)mysqli_insert_id($conn);
+                save_game_tags($conn, $newId, $values["tags"]);
+
+                log_change($conn, $user, "added", "game", $values["title"]);
 
                 header("Location: track.php");
                 exit;

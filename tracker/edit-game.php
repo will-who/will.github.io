@@ -34,6 +34,7 @@
         "description" => $game["description"] ?? "",
     ];
     $allTags = all_tags($conn);
+    $old     = $values;     // pôvodné hodnoty pre zoznam zmien
     $error = "";
     $saved = false;
 
@@ -46,6 +47,7 @@
                 $stmt = mysqli_prepare($conn, "DELETE FROM games WHERE id = ?");
                 mysqli_stmt_bind_param($stmt, "i", $id);
                 mysqli_stmt_execute($stmt);   // favorites sa zmažú cez ON DELETE CASCADE
+                log_change($conn, $user, "deleted", "game", $game["name"]);
                 header("Location: track.php");
                 exit;
             }
@@ -74,6 +76,31 @@
                     mysqli_stmt_execute($stmt);
                     save_game_tags($conn, $id, $values["tags"]);
                     $saved = true;
+
+                    // čo sa presne zmenilo
+                    $changes = [];
+                    if ($old["title"] !== $values["title"]) {
+                        $changes[] = 'title: "' . log_short($old["title"]) . '" → "' . log_short($values["title"]) . '"';
+                    }
+                    if ($old["image"] !== $values["image"]) {
+                        $changes[] = "image source changed";
+                    }
+                    if ($old["description"] !== $values["description"]) {
+                        $changes[] = "description changed";
+                    }
+                    $tagNames = array_column($allTags, "name", "id");
+                    $oldT = array_map("intval", $old["tags"]);
+                    $newT = array_map("intval", $values["tags"]);
+                    sort($oldT); sort($newT);
+                    if ($oldT !== $newT) {
+                        $fmt = function ($ids) use ($tagNames) {
+                            return $ids ? implode(", ", array_map(function ($i) use ($tagNames) { return $tagNames[$i] ?? "#" . $i; }, $ids)) : "none";
+                        };
+                        $changes[] = "tags: " . $fmt($oldT) . " → " . $fmt($newT);
+                    }
+                    if ($changes) {
+                        log_change($conn, $user, "edited", "game", $values["title"], implode("; ", $changes));
+                    }
                 }
                 catch (mysqli_sql_exception $ex) {
                     $error = ($ex->getCode() === 1062)
@@ -130,7 +157,7 @@
 
     <main class="content">
 
-        <a href="track.php" class="back-link">← Back to games</a>
+        <a href="<?= e(back_url((int)$game["id"])) ?>" class="back-link">← Back to games</a>
 
         <div class="content-header">
 

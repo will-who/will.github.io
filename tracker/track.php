@@ -19,7 +19,14 @@
         }
     }
 
+    // Zapamätá si posledný zoznam (filter, tag, triedenie) pre "Back to games"
+    $_SESSION["list_url"] = track_url($view, $sort, $tag);
+
     $orderBy = $sort === "updated" ? "g.updated_at DESC, g.name ASC" : "g.name ASC";
+    // obľúbené hry prihláseného používateľa idú vždy na začiatok (filter a triedenie platia ďalej)
+    if ($user) {
+        $orderBy = "is_fav DESC, " . $orderBy;
+    }
 
     // Hry z databázy (is_fav = 1, ak ich má prihlásený používateľ medzi obľúbenými)
     $where = [];
@@ -64,9 +71,12 @@
         $favCount = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
     }
 
-    // Novinky (posledné 4)
+    // Novinky (posledných 20, na hlavnej stránke sa posúvajú do strán)
     $news = mysqli_fetch_all(mysqli_query($conn,
-        "SELECT id, title, body, image, created_at FROM news ORDER BY created_at DESC, id DESC LIMIT 4"), MYSQLI_ASSOC);
+        "SELECT n.id, n.title, n.body, n.image, n.created_at, n.game_id, g.name AS game_name
+           FROM news n
+           LEFT JOIN games g ON g.id = n.game_id
+          ORDER BY n.created_at DESC, n.id DESC LIMIT 20"), MYSQLI_ASSOC);
 
 ?>
 
@@ -107,6 +117,10 @@
 
 
         <div class="topbar-right">
+
+            <?php if (is_editor($user)): ?>
+            <a href="changelog.php" class="notification users-link" title="Change log">📜</a>
+            <?php endif; ?>
 
             <?php if (is_admin($user)): ?>
             <a href="users.php" class="notification users-link" title="All users">👥</a>
@@ -253,14 +267,17 @@
 
                     <?php foreach ($news as $n): ?>
                     <?php $nImg = img_url($n["image"]); ?>
-                    <article class="news-card">
+                    <<?= $n["game_id"] ? 'a href="game.php?id=' . (int)$n["game_id"] . '"' : 'article' ?> class="news-card<?= $n["game_id"] ? " has-game" : "" ?>">
                         <div class="news-image"<?php if ($nImg): ?> style="background-image: url('<?= e($nImg) ?>');"<?php endif; ?>></div>
                         <div class="news-body">
                             <h3><?= e($n["title"]) ?></h3>
                             <p><?= e($n["body"]) ?></p>
-                            <small><?= e(date("j. n. Y", strtotime($n["created_at"]))) ?></small>
+                            <?php if ($n["game_id"]): ?>
+                            <span class="news-game">🎮 <?= e($n["game_name"]) ?></span>
+                            <?php endif; ?>
+                            <small><?= e(date("j. n. Y H:i", strtotime($n["created_at"]))) ?></small>
                         </div>
-                    </article>
+                    </<?= $n["game_id"] ? 'a' : 'article' ?>>
                     <?php endforeach; ?>
 
                 <?php else: ?>
@@ -342,7 +359,7 @@
 
                 <div class="game-card-wrap" id="game-<?= (int)$game["id"] ?>">
 
-                <?php if ($user): ?>
+                <?php if ($user && !is_admin($user)): ?>
                 <form method="POST" action="favorite.php" class="star-form">
                     <?= csrf_field() ?>
                     <input type="hidden" name="game_id" value="<?= (int)$game["id"] ?>">

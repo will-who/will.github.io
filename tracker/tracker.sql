@@ -24,6 +24,23 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `changelog`
+--
+
+CREATE TABLE `changelog` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `action` varchar(20) NOT NULL,
+  `entity` varchar(20) NOT NULL,
+  `entity_name` varchar(150) NOT NULL DEFAULT '',
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `favorites`
 --
 
@@ -109,6 +126,7 @@ CREATE TABLE `news` (
   `title` varchar(150) NOT NULL,
   `body` varchar(300) NOT NULL DEFAULT '',
   `image` varchar(500) DEFAULT NULL,
+  `game_id` int(10) UNSIGNED DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -240,6 +258,14 @@ INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_act
 --
 
 --
+-- Indexes for table `changelog`
+--
+ALTER TABLE `changelog`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_changelog_created` (`created_at`),
+  ADD KEY `fk_changelog_user` (`user_id`);
+
+--
 -- Indexes for table `favorites`
 --
 ALTER TABLE `favorites`
@@ -264,7 +290,8 @@ ALTER TABLE `game_tags`
 -- Indexes for table `news`
 --
 ALTER TABLE `news`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_news_game` (`game_id`);
 
 --
 -- Indexes for table `password_resets`
@@ -309,6 +336,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `changelog`
+--
+ALTER TABLE `changelog`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
@@ -349,6 +382,12 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `changelog`
+--
+ALTER TABLE `changelog`
+  ADD CONSTRAINT `fk_changelog_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `favorites`
 --
 ALTER TABLE `favorites`
@@ -361,6 +400,12 @@ ALTER TABLE `favorites`
 ALTER TABLE `game_tags`
   ADD CONSTRAINT `fk_game_tags_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_game_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `news`
+--
+ALTER TABLE `news`
+  ADD CONSTRAINT `fk_news_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `password_resets`
