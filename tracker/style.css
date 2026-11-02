@@ -2356,3 +2356,18 @@ a.news-card.has-game:hover {
     background: #3a1d1f;
     color: #ff8a8a;
 }
+
+
+/* Logo v hornej lište (vľavo pred HOME) */
+.logo-link {
+    display: flex;
+    align-items: center;
+}
+
+.topbar-logo {
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
