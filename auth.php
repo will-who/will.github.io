@@ -71,7 +71,7 @@
         $hash = hash("sha256", $_COOKIE[AUTH_COOKIE]);
 
         $stmt = mysqli_prepare($conn,
-            "SELECT u.id, u.username, u.email, u.role
+            "SELECT u.id, u.username, u.email, u.role, u.avatar
                FROM sessions s
                JOIN users u ON u.id = s.user_id
               WHERE s.token = ? AND s.expires_at > NOW() AND u.is_active = 1
@@ -191,13 +191,14 @@
         return "";
     }
 
-    // URL hlavnej stránky so zachovaným filtrom (view), tagom (tag) a triedením (sort)
-    function track_url($view = "all", $sort = "az", $tag = 0) {
-        $q = [];
-        if ($view !== "all") { $q["view"] = $view; }
-        if ($tag)            { $q["tag"]  = (int)$tag; }
-        if ($sort !== "az")  { $q["sort"] = $sort; }
-        return "track.php" . ($q ? "?" . http_build_query($q) : "");
+    // URL hlavnej stránky so zachovaným filtrom (view), tagom (tag), hľadaním (q) a triedením (sort)
+    function track_url($view = "all", $sort = "az", $tag = 0, $search = "") {
+        $params = [];
+        if ($view !== "all")  { $params["view"] = $view; }
+        if ($tag)             { $params["tag"]  = (int)$tag; }
+        if ($search !== "")   { $params["q"]    = $search; }
+        if ($sort !== "az")   { $params["sort"] = $sort; }
+        return "track.php" . ($params ? "?" . http_build_query($params) : "");
     }
 
 
@@ -382,6 +383,203 @@
     function log_short($s, $max = 60) {
         $s = trim(preg_replace('/\s+/', ' ', (string)$s));
         return mb_strlen($s, "UTF-8") > $max ? mb_substr($s, 0, $max, "UTF-8") . "…" : $s;
+    }
+
+    /* ---------- Profilovky (avatar) ---------- */
+
+    const AVATAR_DIR = "uploads/avatars";
+
+    // Bezpečná cesta k súboru profilovky alebo "" ak žiadna nie je
+    function avatar_src($file) {
+        $file = (string)$file;
+        return preg_match('/^[A-Za-z0-9_.\-]{1,100}$/', $file) ? AVATAR_DIR . "/" . $file : "";
+    }
+
+    // Obrázok profilovky, alebo kruh s prvým písmenom mena, ak ju používateľ nemá
+    function avatar_html($username, $file, $class = "avatar-sm") {
+        $src = avatar_src($file);
+        if ($src !== "") {
+            return '<img class="avatar ' . e($class) . '" src="' . e($src) . '" alt="">';
+        }
+        $initial = mb_strtoupper(mb_substr((string)$username, 0, 1, "UTF-8"), "UTF-8");
+        return '<span class="avatar avatar-default ' . e($class) . '">' . e($initial) . '</span>';
+    }
+
+    /* ---------- Priatelia a notifikácie (zvonček) ---------- */
+
+    // "3 hours ago" z počtu sekúnd (rozdiel sa počíta v databáze)
+    function time_ago($seconds) {
+        $s = max(0, (int)$seconds);
+        if ($s < 60)    { return "just now"; }
+        if ($s < 3600)  { $n = intdiv($s, 60);   return $n . " minute" . ($n === 1 ? "" : "s") . " ago"; }
+        if ($s < 86400) { $n = intdiv($s, 3600); return $n . " hour"   . ($n === 1 ? "" : "s") . " ago"; }
+        $n = intdiv($s, 86400);
+        return $n . " day" . ($n === 1 ? "" : "s") . " ago";
+    }
+
+    // Skryté pole "kam sa vrátiť" po akcii (aktuálna stránka)
+    function back_field() {
+        return '<input type="hidden" name="back" value="' . e($_SERVER["REQUEST_URI"] ?? "") . '">';
+    }
+
+    // Povolí len cestu v rámci stránky (žiadne cudzie adresy)
+    function safe_back($b, $default) {
+        $b = (string)$b;
+        if ($b !== "" && $b[0] === "/" && strlen($b) < 500 && !preg_match('#^//|[\r\n\\\\]#', $b)) {
+            return $b;
+        }
+        return $default;
+    }
+
+    // Zvonček s notifikáciami (rozbaľovací zoznam), len pre prihláseného používateľa
+    function bell_html($conn, $user) {
+        $uid = (int)$user["id"];
+
+        $stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+        mysqli_stmt_bind_param($stmt, "i", $uid);
+        mysqli_stmt_execute($stmt);
+        $unread = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+
+        $stmt = mysqli_prepare($conn,
+            "SELECT n.id, n.type, n.is_read, n.from_user_id, n.media_id, u.username, u.avatar,
+                    TIMESTAMPDIFF(SECOND, n.created_at, NOW()) AS ago,
+                    f.status AS fstatus, m.caption AS clip_caption
+               FROM notifications n
+               JOIN users u ON u.id = n.from_user_id
+               LEFT JOIN friendships f ON f.requester_id = n.from_user_id AND f.addressee_id = n.user_id
+               LEFT JOIN game_media m ON m.id = n.media_id
+              WHERE n.user_id = ?
+              ORDER BY n.created_at DESC, n.id DESC
+              LIMIT 20");
+        mysqli_stmt_bind_param($stmt, "i", $uid);
+        mysqli_stmt_execute($stmt);
+        $items = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+
+        $h  = '<details class="bell" id="bell" data-csrf="' . e(csrf_token()) . '">';
+        $h .= '<summary class="notification" title="Notifications">🕭';
+        if ($unread) {
+            $h .= '<span class="bell-badge">' . ($unread > 9 ? "9+" : $unread) . '</span>';
+        }
+        $h .= '</summary><div class="bell-menu">';
+        $h .= '<div class="bell-head"><strong>Notifications</strong>';
+        if ($unread) {
+            $h .= '<form method="POST" action="notifications.php">' . csrf_field() . back_field()
+                . '<input type="hidden" name="action" value="read_all">'
+                . '<button type="submit" class="rate-remove">Mark all as read</button></form>';
+        }
+        $h .= '</div>';
+
+        if (!$items) {
+            $h .= '<p class="bell-empty">No notifications yet.</p>';
+        }
+
+        foreach ($items as $it) {
+            $fid  = (int)$it["from_user_id"];
+            $name = '<a href="account.php?id=' . $fid . '"><strong>' . e($it["username"]) . '</strong></a>';
+
+            $h .= '<div class="bell-item' . ($it["is_read"] ? "" : " unread") . '">';
+            $h .= '<a href="account.php?id=' . $fid . '">' . avatar_html($it["username"], $it["avatar"], "avatar-sm") . '</a>';
+            $h .= '<div class="bell-text">';
+
+            if ($it["type"] === "friend_request") {
+                $h .= '<div>' . $name . ' sent you a friend request</div>';
+                $h .= '<small>' . e(time_ago($it["ago"])) . '</small>';
+
+                if ($it["fstatus"] === "pending") {
+                    $h .= '<div class="bell-actions">';
+                    foreach (["accept" => "ACCEPT", "decline" => "DECLINE"] as $act => $label) {
+                        $h .= '<form method="POST" action="friend.php">' . csrf_field() . back_field()
+                            . '<input type="hidden" name="action" value="' . $act . '">'
+                            . '<input type="hidden" name="user_id" value="' . $fid . '">'
+                            . '<button type="submit" class="bell-btn' . ($act === "decline" ? " muted" : "") . '">' . $label . '</button></form>';
+                    }
+                    $h .= '</div>';
+                } elseif ($it["fstatus"] === "accepted") {
+                    $h .= '<div class="bell-state">✓ You are now friends</div>';
+                } else {
+                    $h .= '<div class="bell-state">Request is no longer available</div>';
+                }
+            }
+            elseif ($it["type"] === "friend_accepted") {
+                $h .= '<div>' . $name . ' accepted your friend request</div>';
+                $h .= '<small>' . e(time_ago($it["ago"])) . '</small>';
+            }
+            elseif ($it["type"] === "clip_like" || $it["type"] === "clip_comment") {
+                $isLike  = $it["type"] === "clip_like";
+                $clipUrl = "clip.php?id=" . (int)$it["media_id"] . ($isLike ? "" : "#comments");
+                $caption = (string)$it["clip_caption"];
+
+                $h .= '<div>' . $name . ($isLike ? ' liked ' : ' commented on ')
+                    . '<a href="' . e($clipUrl) . '"><strong>your clip</strong></a>'
+                    . ($caption !== "" ? ' “' . e(log_short($caption, 40)) . '”' : "") . '</div>';
+                $h .= '<small>' . e(time_ago($it["ago"])) . '</small>';
+            }
+
+            $h .= '</div></div>';
+        }
+
+        $h .= '</div></details>';
+
+        // skript sa vypíše len raz: po otvorení označí notifikácie ako prečítané, klik mimo zvonček zavrie
+        static $script = false;
+        if (!$script) {
+            $script = true;
+            $h .= '<script>(function(){var d=document.getElementById("bell");if(!d){return;}'
+                . 'd.addEventListener("toggle",function(){if(!d.open){return;}var b=d.querySelector(".bell-badge");if(!b){return;}'
+                . 'var fd=new FormData();fd.append("csrf",d.getAttribute("data-csrf"));fd.append("action","read_all");'
+                . 'fetch("notifications.php",{method:"POST",body:fd,headers:{"X-Requested-With":"fetch"},credentials:"same-origin"})'
+                . '.then(function(){if(b.parentNode){b.parentNode.removeChild(b);}});});'
+                . 'document.addEventListener("click",function(e){if(d.open&&!d.contains(e.target)){d.open=false;}});})();</script>';
+        }
+
+        return $h;
+    }
+
+    /* ---------- Lajky a komentáre klipov ---------- */
+
+    // Pošle notifikáciu majiteľovi klipu (typ: clip_like / clip_comment). Sebe sa nič neposiela.
+    function notify_clip($conn, $toUserId, $fromUserId, $type, $mediaId) {
+        if ((int)$toUserId === (int)$fromUserId) {
+            return;
+        }
+        $to = (int)$toUserId; $from = (int)$fromUserId; $mid = (int)$mediaId;
+
+        if ($type === "clip_like") {
+            // jeden lajk = jedna notifikácia (opakované lajkovanie ich nehromadí)
+            drop_clip_notification($conn, $to, $from, $type, $mid);
+        }
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO notifications (user_id, from_user_id, type, media_id) VALUES (?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "iisi", $to, $from, $type, $mid);
+        mysqli_stmt_execute($stmt);
+    }
+
+    function drop_clip_notification($conn, $toUserId, $fromUserId, $type, $mediaId) {
+        $to = (int)$toUserId; $from = (int)$fromUserId; $mid = (int)$mediaId;
+        $stmt = mysqli_prepare($conn,
+            "DELETE FROM notifications WHERE user_id = ? AND from_user_id = ? AND type = ? AND media_id = ?");
+        mysqli_stmt_bind_param($stmt, "iisi", $to, $from, $type, $mid);
+        mysqli_stmt_execute($stmt);
+    }
+
+    // Koľko lajkov dostali všetky klipy používateľa dokopy
+    function clip_likes_received($conn, $userId) {
+        $uid = (int)$userId;
+        $stmt = mysqli_prepare($conn,
+            "SELECT COUNT(*) FROM media_likes l JOIN game_media m ON m.id = l.media_id WHERE m.user_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $uid);
+        mysqli_stmt_execute($stmt);
+        return (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+    }
+
+
+    /* ---------- Screenshoty a klipy od používateľov ---------- */
+
+    const MEDIA_DIR = "uploads/media";
+
+    // Bezpečná cesta k nahranému screenshotu alebo ""
+    function media_src($file) {
+        return preg_match('/^[A-Za-z0-9_.\-]{1,120}$/', (string)$file) ? MEDIA_DIR . "/" . $file : "";
     }
 
     function e($s) {

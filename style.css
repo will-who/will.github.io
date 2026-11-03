@@ -2540,3 +2540,792 @@ a.news-card:hover .news-readmore {
     color: #e8ebf0;
     font-size: 15px;
 }
+
+
+/* =========================================================
+   PROFILOVKY, ÚČET, GALÉRIA
+========================================================= */
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #2b3039;
+    color: #dfe2e7;
+    font-weight: bold;
+}
+
+.avatar-xs { width: 24px;  height: 24px;  font-size: 12px; }
+.avatar-sm { width: 34px;  height: 34px;  font-size: 15px; }
+.avatar-lg { width: 120px; height: 120px; font-size: 48px; }
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.topbar-user:hover .username {
+    color: white;
+}
+
+.review-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.review-user:hover strong {
+    text-decoration: underline;
+}
+
+/* Stránka účtu */
+.profile-card {
+    max-width: 700px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 24px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.profile-info h1 {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+}
+
+.profile-meta {
+    margin-top: 8px;
+    color: #737a86;
+    font-size: 13px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 36px;
+    margin-top: 18px;
+}
+
+.profile-stats div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-stats strong {
+    font-size: 24px;
+    color: white;
+}
+
+.profile-stats span {
+    color: #6f7783;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.profile-pfp input[type="file"] {
+    color: #bfc4cc;
+    font-size: 14px;
+}
+
+.profile-pfp-actions {
+    display: flex;
+    gap: 14px;
+}
+
+.profile-pfp-remove {
+    margin-top: 14px;
+}
+
+.profile-pfp .rating-meta {
+    margin-top: 18px;
+}
+
+/* Galéria na stránke hry */
+.gallery {
+    max-width: 700px;
+    margin-top: 40px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.gallery-thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    background: #2b3039 center / cover no-repeat;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button.gallery-thumb:hover {
+    border-color: #555a64;
+    transform: translateY(-2px);
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.88);
+}
+
+.lightbox[hidden] {
+    display: none;
+}
+
+.lightbox img {
+    max-width: 88vw;
+    max-height: 88vh;
+    border-radius: 4px;
+}
+
+.lightbox button {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #dfe2e7;
+    cursor: pointer;
+}
+
+.lightbox-close { top: 18px; right: 26px; font-size: 40px; }
+.lightbox-nav   { top: 50%; transform: translateY(-50%); font-size: 64px; padding: 0 18px; }
+.lightbox-prev  { left: 8px; }
+.lightbox-next  { right: 8px; }
+
+.lightbox button:hover {
+    color: white;
+}
+
+/* Recenzie: formulár pod nadpisom "Reviews" */
+.reviews .rate-box {
+    margin: 16px 0 26px;
+}
+
+/* Správa galérie v edit-game.php */
+.gallery-edit {
+    max-width: 900px;
+    margin-top: 40px;
+}
+
+.gallery-edit-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gallery-add {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.gallery-add input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+
+/* Štatistiky na stránke účtu: dva rovnako veľké boxy */
+.profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 380px;
+}
+
+.profile-stats div {
+    align-items: center;
+    padding: 14px 10px;
+    background: #10151f;
+    border-radius: 6px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   ZVONČEK (notifikácie) + PRIATELIA
+========================================================= */
+
+.bell {
+    position: relative;
+}
+
+.bell summary {
+    list-style: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.bell summary::-webkit-details-marker {
+    display: none;
+}
+
+.bell-badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #d93f3f;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 17px;
+    text-align: center;
+}
+
+.bell-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 50;
+    width: 340px;
+    max-height: 440px;
+    overflow-y: auto;
+    border: 1px solid #3a3e47;
+    border-radius: 6px;
+    background: #282c34;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.bell-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #3a3e47;
+    font-size: 14px;
+}
+
+.bell-empty {
+    padding: 22px 14px;
+    color: #8a909b;
+    font-size: 14px;
+    text-align: center;
+}
+
+.bell-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #323741;
+    font-size: 14px;
+    color: #dfe2e7;
+}
+
+.bell-item:last-child {
+    border-bottom: none;
+}
+
+.bell-item.unread {
+    background: #2f3541;
+    box-shadow: inset 3px 0 0 #aeb3bd;
+}
+
+.bell-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.bell-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.bell-text small {
+    color: #8a909b;
+}
+
+.bell-state {
+    color: #9ea5af;
+    font-size: 13px;
+}
+
+.bell-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.bell-btn {
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid #555a64;
+    border-radius: 4px;
+    background: #3b3f48;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.bell-btn:hover {
+    background: #4a4f5a;
+}
+
+.bell-btn.muted {
+    background: transparent;
+    color: #aeb3bd;
+}
+
+/* Meno + tlačidlo "Add friend" na stránke účtu */
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.friend-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-state {
+    color: #9ea5af;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   STRÁNKA FRIENDS
+========================================================= */
+
+.friend-search {
+    display: flex;
+    gap: 12px;
+    max-width: 700px;
+    margin-top: 20px;
+}
+
+.friend-search input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.friend-section {
+    max-width: 700px;
+    margin-top: 34px;
+}
+
+.friend-list {
+    margin-top: 12px;
+    border-radius: 6px;
+    background: #161c27;
+}
+
+.friend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #232a37;
+}
+
+.friend-row:last-child {
+    border-bottom: none;
+}
+
+.friend-who {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.friend-who:hover strong {
+    text-decoration: underline;
+}
+
+.friend-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-view {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   SCREENSHOTY A KLIPY OD POUŽÍVATEĽOV
+========================================================= */
+
+.media {
+    max-width: 700px;
+    margin-top: 40px;
+}
+
+.media-sub {
+    margin-top: 26px;
+    font-size: 15px;
+    color: #9ea5af;
+}
+
+.media-add {
+    margin-top: 14px;
+}
+
+.media-add summary {
+    display: inline-flex;
+    align-items: center;
+    list-style: none;
+    cursor: pointer;
+}
+
+.media-add summary::-webkit-details-marker {
+    display: none;
+}
+
+.media-forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.media-forms form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.media-forms h3 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.media-forms input[type="text"] {
+    padding: 9px 11px;
+    background: #10151f;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    color: #e8ebf0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.media-forms input[type="file"] {
+    color: #bfc4cc;
+    font-size: 13px;
+}
+
+.media-forms .account-button {
+    align-self: flex-start;
+}
+
+.media-item {
+    margin: 0;
+}
+
+.media-item figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.media-caption {
+    color: #dfe2e7;
+}
+
+.media-by {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #8a909b;
+}
+
+.media-by small {
+    color: #8a909b;
+}
+
+.clip-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.clip-thumb {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    border: 1px solid #2b3039;
+    border-radius: 4px;
+    background: #2b3039 center / cover no-repeat;
+    cursor: pointer;
+}
+
+.clip-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    font-size: 18px;
+    line-height: 46px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.clip-thumb:hover .clip-play {
+    background: rgba(0, 0, 0, 0.85);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.clip-frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: 4px;
+}
+
+@media (max-width: 700px) {
+    .media-forms {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   KLIPY: stránka klipu, lajky, komentáre
+========================================================= */
+
+/* miniatúra klipu môže byť odkaz */
+a.clip-thumb {
+    text-decoration: none;
+}
+
+.media-stats {
+    display: block;
+    margin-top: 4px;
+    color: #8a909b;
+    font-size: 12px;
+}
+
+.media-stats a {
+    color: #c6cad1;
+    text-decoration: none;
+}
+
+.media-stats a:hover {
+    color: white;
+}
+
+.profile-clips {
+    margin-top: 30px;
+}
+
+.clip-page {
+    max-width: 800px;
+}
+
+.clip-player {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 18px;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.clip-player iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.clip-page h1 {
+    margin-bottom: 8px;
+}
+
+.clip-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    color: #8a909b;
+    font-size: 14px;
+}
+
+.clip-meta a {
+    color: #d8dce2;
+    text-decoration: none;
+}
+
+.clip-meta a:hover {
+    color: white;
+}
+
+.clip-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 18px 0 8px;
+    scroll-margin-top: 20px;
+}
+
+.clip-actions form {
+    margin: 0;
+}
+
+.like-btn {
+    padding: 8px 16px;
+    border: 1px solid #373d48;
+    border-radius: 999px;
+    background: #151922;
+    color: #c6cad1;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border 0.2s, background 0.2s, color 0.2s;
+}
+
+.like-btn:hover {
+    border-color: #686b70;
+    color: white;
+}
+
+.like-btn.liked {
+    border-color: #6b2b3a;
+    background: #2a1820;
+    color: #ff6b8a;
+}
+
+.like-btn.static {
+    cursor: default;
+}
+
+.clip-comments {
+    margin-top: 28px;
+    scroll-margin-top: 20px;
+}
+
+.clip-comments h2 {
+    margin-bottom: 14px;
+}
+
+.clip-comments .review-form {
+    margin-bottom: 10px;
+}
+
+.clip-comment {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid #2b3039;
+}
+
+.clip-comment-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.clip-comment p {
+    margin: 6px 0 0;
+    color: #c6cad1;
+    font-size: 15px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+
+/* Hľadanie hier v bočnom paneli */
+form.search {
+    margin: 0;
+}
+
+.search button {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #b8bdc7;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.search button:hover {
+    color: white;
+}
+
+.search:focus-within {
+    border-color: #ffffff;
+}
+
+.search-info {
+    margin: 0 0 18px;
+    color: #9ea5af;
+    font-size: 14px;
+}
+
+.search-info a {
+    color: #d8dce2;
+}

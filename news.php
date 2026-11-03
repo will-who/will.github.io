@@ -155,14 +155,15 @@
 
         <nav>
             <a href="track.php" class="active">HOME</a>
-            <a href="#">FRIENDS</a>
+            <a href="friends.php">FRIENDS</a>
             <a href="#">GLOBAL CHATROOM</a>
         </nav>
 
         <div class="topbar-right">
+            <?= bell_html($conn, $user) ?>
             <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
-            <span class="username"><?= e($user["username"]) ?></span>
+            <a href="account.php" class="topbar-user" title="<?= e($user["username"]) ?>"><?= avatar_html($user["username"], $user["avatar"] ?? null, "avatar-sm") ?></a>
 
             <form method="POST" action="logout.php" class="logout-form">
                 <?= csrf_field() ?>

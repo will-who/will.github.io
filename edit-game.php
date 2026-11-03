@@ -54,6 +54,49 @@
             $error = "Invalid form, please reload the page.";
         }
 
+        /* ---------- Galéria: pridanie / zmazanie obrázka ---------- */
+        elseif (in_array($_POST["action"] ?? "", ["add_image", "delete_image"], true)) {
+
+            if (!csrf_valid()) {
+                flash("error", "Invalid form, please reload the page.");
+            }
+            elseif ($_POST["action"] === "add_image") {
+                $src = trim($_POST["gallery_image"] ?? "");
+
+                $stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM game_images WHERE game_id = ?");
+                mysqli_stmt_bind_param($stmt, "i", $id);
+                mysqli_stmt_execute($stmt);
+                $cnt = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+
+                if ($src === "" || !valid_image_src($src)) {
+                    flash("error", "Image source must be an https:// link or a file path like img/game.png.");
+                } elseif ($cnt >= 30) {
+                    flash("error", "The gallery can have at most 30 images.");
+                } else {
+                    $stmt = mysqli_prepare($conn, "INSERT INTO game_images (game_id, image) VALUES (?, ?)");
+                    mysqli_stmt_bind_param($stmt, "is", $id, $src);
+                    mysqli_stmt_execute($stmt);
+                    log_change($conn, $user, "edited", "game", $game["name"], "gallery image added");
+                    flash("ok", "Image added to the gallery.");
+                }
+            }
+            else {
+                $imgId = filter_input(INPUT_POST, "image_id", FILTER_VALIDATE_INT);
+                if ($imgId) {
+                    $stmt = mysqli_prepare($conn, "DELETE FROM game_images WHERE id = ? AND game_id = ?");
+                    mysqli_stmt_bind_param($stmt, "ii", $imgId, $id);
+                    mysqli_stmt_execute($stmt);
+                    if (mysqli_stmt_affected_rows($stmt) > 0) {
+                        log_change($conn, $user, "edited", "game", $game["name"], "gallery image removed");
+                        flash("ok", "Image removed from the gallery.");
+                    }
+                }
+            }
+
+            header("Location: edit-game.php?id=" . $id . "#gallery");
+            exit;
+        }
+
         /* ---------- Uloženie zmien ---------- */
         else {
 
@@ -121,6 +164,13 @@
     $imgBack  = img_url($game["image_back"]);
     $imgFront = img_url($game["image_front"]);
 
+    // Galéria hry (+ prípadná hláška po pridaní / zmazaní obrázka)
+    $stmt = mysqli_prepare($conn, "SELECT id, image FROM game_images WHERE game_id = ? ORDER BY id");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $gallery = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+    $flash   = pull_flash();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -140,15 +190,16 @@
 
         <nav>
             <a href="track.php" class="active">HOME</a>
-            <a href="#">FRIENDS</a>
+            <a href="friends.php">FRIENDS</a>
             <a href="#">GLOBAL CHATROOM</a>
         </nav>
 
         <div class="topbar-right">
 
+            <?= bell_html($conn, $user) ?>
             <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
-            <span class="username"><?= e($user["username"]) ?></span>
+            <a href="account.php" class="topbar-user" title="<?= e($user["username"]) ?>"><?= avatar_html($user["username"], $user["avatar"] ?? null, "avatar-sm") ?></a>
 
             <form method="POST" action="logout.php" class="logout-form">
                 <?= csrf_field() ?>
@@ -241,6 +292,44 @@
             </div>
 
         </div>
+
+
+        <section class="gallery-edit" id="gallery">
+
+            <h2>Gallery</h2>
+
+            <?php if ($flash): ?>
+                <div class="flash-msg <?= $flash[0] === "ok" ? "ok" : "error" ?>"><?= e($flash[1]) ?></div>
+            <?php endif; ?>
+
+            <?php if ($gallery): ?>
+            <div class="gallery-grid">
+                <?php foreach ($gallery as $gi): ?>
+                <div class="gallery-edit-item">
+                    <div class="gallery-thumb" style="background-image: url('<?= e(img_url($gi["image"])) ?>');"></div>
+
+                    <form method="POST" action="edit-game.php?id=<?= (int)$game["id"] ?>">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="action" value="delete_image">
+                        <input type="hidden" name="image_id" value="<?= (int)$gi["id"] ?>">
+                        <button type="submit" class="danger-button">REMOVE</button>
+                    </form>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+                <p class="rating-meta">No images yet.</p>
+            <?php endif; ?>
+
+            <form method="POST" action="edit-game.php?id=<?= (int)$game["id"] ?>" class="gallery-add">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="add_image">
+                <input type="text" name="gallery_image" maxlength="500"
+                       placeholder="https://… or img/screenshot.png" autocomplete="off" required>
+                <button type="submit" class="account-button">ADD IMAGE</button>
+            </form>
+
+        </section>
 
     </main>
 

@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hostiteľ: 127.0.0.1
--- Čas generovania: Po 02.Nov 2026, 12:03
--- Verzia serveru: 10.4.32-MariaDB
--- Verzia PHP: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Nov 02, 2026 at 10:29 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Databáza: `tracker`
+-- Database: `tracker`
 --
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `changelog`
+-- Table structure for table `changelog`
 --
 
 CREATE TABLE `changelog` (
@@ -38,21 +38,10 @@ CREATE TABLE `changelog` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Sťahujem dáta pre tabuľku `changelog`
---
-
-INSERT INTO `changelog` (`id`, `user_id`, `username`, `action`, `entity`, `entity_name`, `details`, `created_at`) VALUES
-(1, 4, 'admin', 'added', 'news', 'pes', NULL, '2026-11-02 10:38:23'),
-(2, 4, 'admin', 'promoted', 'user', 'editor', 'now an editor', '2026-11-02 10:59:51'),
-(3, 9, 'editor', 'edited', 'news', 'New deadlock update now has halloween', 'game: none → Deadlock', '2026-11-02 11:01:27'),
-(4, 9, 'editor', 'edited', 'news', 'Apex Legends will be great again', 'game: none → Apex Legends', '2026-11-02 11:02:14'),
-(5, 9, 'editor', 'deleted', 'news', 'pes', NULL, '2026-11-02 11:02:18');
-
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `favorites`
+-- Table structure for table `favorites`
 --
 
 CREATE TABLE `favorites` (
@@ -62,17 +51,30 @@ CREATE TABLE `favorites` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `favorites`
+-- Dumping data for table `favorites`
 --
 
 INSERT INTO `favorites` (`user_id`, `game_id`, `created_at`) VALUES
-(9, 7, '2026-11-02 10:37:57'),
 (9, 9, '2026-11-02 09:27:58');
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `games`
+-- Table structure for table `friendships`
+--
+
+CREATE TABLE `friendships` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `requester_id` int(10) UNSIGNED NOT NULL,
+  `addressee_id` int(10) UNSIGNED NOT NULL,
+  `status` enum('pending','accepted') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `games`
 --
 
 CREATE TABLE `games` (
@@ -89,7 +91,7 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `games`
+-- Dumping data for table `games`
 --
 
 INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_size`, `image_position`, `description`, `created_at`, `updated_at`) VALUES
@@ -105,7 +107,37 @@ INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `game_tags`
+-- Table structure for table `game_images`
+--
+
+CREATE TABLE `game_images` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `game_id` int(10) UNSIGNED NOT NULL,
+  `image` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `game_media`
+--
+
+CREATE TABLE `game_media` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `game_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `type` enum('screenshot','clip') NOT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `video_id` varchar(20) DEFAULT NULL,
+  `caption` varchar(150) NOT NULL DEFAULT '',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `game_tags`
 --
 
 CREATE TABLE `game_tags` (
@@ -114,7 +146,7 @@ CREATE TABLE `game_tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `game_tags`
+-- Dumping data for table `game_tags`
 --
 
 INSERT INTO `game_tags` (`game_id`, `tag_id`) VALUES
@@ -130,7 +162,33 @@ INSERT INTO `game_tags` (`game_id`, `tag_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `news`
+-- Table structure for table `media_comments`
+--
+
+CREATE TABLE `media_comments` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `media_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `comment` varchar(500) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `media_likes`
+--
+
+CREATE TABLE `media_likes` (
+  `media_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `news`
 --
 
 CREATE TABLE `news` (
@@ -144,17 +202,33 @@ CREATE TABLE `news` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `news`
+-- Dumping data for table `news`
 --
 
-INSERT INTO `news` (`id`, `title`, `body`, `image`, `game_id`, `created_at`, `updated_at`) VALUES
-(1, 'Apex Legends will be great again', 'EPIC NEWS!!!!\r\nNext season lifeline is getting shield revive again', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCdI299kjsJd3wXRHLt15-KsuSQzI8RLX5ODiHEYVaJA&s=10', 3, '2026-11-02 09:21:41', '2026-11-02 11:02:14'),
-(2, 'New deadlock update now has halloween', 'yup', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrMkjc1jDduAhdmMC0tT2H__ihReHSmx_xjfSjfIQyQ&s=10', 7, '2026-11-02 09:22:17', '2026-11-02 11:01:27');
+INSERT INTO `news` (`id`, `title`, `body`, `image`, `created_at`, `updated_at`) VALUES
+(1, 'Apex Legends will be great again', 'EPIC NEWS!!!!\r\nNext season lifeline is getting shield revive again', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCdI299kjsJd3wXRHLt15-KsuSQzI8RLX5ODiHEYVaJA&s=10', '2026-11-02 09:21:41', '2026-11-02 09:21:41'),
+(2, 'New deadlock update now has halloween', 'yup', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrMkjc1jDduAhdmMC0tT2H__ihReHSmx_xjfSjfIQyQ&s=10', '2026-11-02 09:22:17', '2026-11-02 09:22:17');
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `password_resets`
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `from_user_id` int(10) UNSIGNED NOT NULL,
+  `media_id` int(10) UNSIGNED DEFAULT NULL,
+  `type` varchar(30) NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_resets`
 --
 
 CREATE TABLE `password_resets` (
@@ -166,7 +240,7 @@ CREATE TABLE `password_resets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `password_resets`
+-- Dumping data for table `password_resets`
 --
 
 INSERT INTO `password_resets` (`id`, `user_id`, `token`, `expires_at`, `used`) VALUES
@@ -175,7 +249,7 @@ INSERT INTO `password_resets` (`id`, `user_id`, `token`, `expires_at`, `used`) V
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `ratings`
+-- Table structure for table `ratings`
 --
 
 CREATE TABLE `ratings` (
@@ -188,7 +262,7 @@ CREATE TABLE `ratings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `ratings`
+-- Dumping data for table `ratings`
 --
 
 INSERT INTO `ratings` (`user_id`, `game_id`, `rating`, `comment`, `created_at`, `updated_at`) VALUES
@@ -200,7 +274,7 @@ INSERT INTO `ratings` (`user_id`, `game_id`, `rating`, `comment`, `created_at`, 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `sessions` (
@@ -213,18 +287,16 @@ CREATE TABLE `sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `sessions`
+-- Dumping data for table `sessions`
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
-(20, 9, 'e1ab5dfbb4503b7aca4721ab5d6c776776d939d79752fe5d5d58e13bfc933993', '::1', '2026-11-02 09:26:33', '2026-11-09 10:26:33'),
-(24, 4, '4f3008d64371b2be31fc2ebd7e90acbae6ab437618138025ef108f3631a26cba', '::1', '2026-11-02 10:38:09', '2026-11-09 11:38:09'),
-(34, 9, '612553a2669af5ae085178036951c8aa202a1d6d6de40731a1b70ca431bf91ed', '::1', '2026-11-02 11:00:01', '2026-11-09 12:00:01');
+(20, 9, 'e1ab5dfbb4503b7aca4721ab5d6c776776d939d79752fe5d5d58e13bfc933993', '::1', '2026-11-02 09:26:33', '2026-11-09 10:26:33');
 
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `tags`
+-- Table structure for table `tags`
 --
 
 CREATE TABLE `tags` (
@@ -233,10 +305,11 @@ CREATE TABLE `tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `tags`
+-- Dumping data for table `tags`
 --
 
 INSERT INTO `tags` (`id`, `name`) VALUES
+(4, 'Battle Royale'),
 (1, 'First person shooter'),
 (3, 'Team based shooter'),
 (2, 'Third person shooter');
@@ -244,13 +317,14 @@ INSERT INTO `tags` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Štruktúra tabuľky pre tabuľku `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
   `id` int(10) UNSIGNED NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('user','editor','admin') NOT NULL DEFAULT 'user',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
@@ -259,20 +333,20 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Sťahujem dáta pre tabuľku `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_active`, `created_at`, `last_login`) VALUES
-(4, 'admin', 'lubkobernhauser2@gmail.com', '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-02 10:59:47'),
-(7, 'user', 'amaha1337@centrum.sk', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'user', 1, '2026-11-02 09:05:58', '2026-11-02 10:59:06'),
-(9, 'editor', 'luboslav.berny@gmail.com', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'editor', 1, '2026-11-02 09:19:08', '2026-11-02 11:00:01');
+(4, 'admin', 'lubkobernhauser2@gmail.com', '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-02 09:20:07'),
+(7, 'user', 'amaha1337@centrum.sk', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'user', 1, '2026-11-02 09:05:58', '2026-11-02 09:23:28'),
+(9, 'user2', 'luboslav.berny@gmail.com', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'user', 1, '2026-11-02 09:19:08', '2026-11-02 09:26:33');
 
 --
--- Kľúče pre exportované tabuľky
+-- Indexes for dumped tables
 --
 
 --
--- Indexy pre tabuľku `changelog`
+-- Indexes for table `changelog`
 --
 ALTER TABLE `changelog`
   ADD PRIMARY KEY (`id`),
@@ -280,35 +354,82 @@ ALTER TABLE `changelog`
   ADD KEY `fk_changelog_user` (`user_id`);
 
 --
--- Indexy pre tabuľku `favorites`
+-- Indexes for table `favorites`
 --
 ALTER TABLE `favorites`
   ADD PRIMARY KEY (`user_id`,`game_id`),
   ADD KEY `idx_favorites_game` (`game_id`);
 
 --
--- Indexy pre tabuľku `games`
+-- Indexes for table `friendships`
+--
+ALTER TABLE `friendships`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_friend_pair` (`requester_id`,`addressee_id`),
+  ADD KEY `idx_friend_addressee` (`addressee_id`);
+
+--
+-- Indexes for table `games`
 --
 ALTER TABLE `games`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_games_name` (`name`);
 
 --
--- Indexy pre tabuľku `game_tags`
+-- Indexes for table `game_images`
+--
+ALTER TABLE `game_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_game_images_game` (`game_id`);
+
+--
+-- Indexes for table `game_media`
+--
+ALTER TABLE `game_media`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_media_game` (`game_id`),
+  ADD KEY `idx_media_user` (`user_id`);
+
+--
+-- Indexes for table `game_tags`
 --
 ALTER TABLE `game_tags`
   ADD PRIMARY KEY (`game_id`,`tag_id`),
   ADD KEY `idx_game_tags_tag` (`tag_id`);
 
 --
--- Indexy pre tabuľku `news`
+-- Indexes for table `media_comments`
+--
+ALTER TABLE `media_comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_mcomments_media` (`media_id`,`created_at`),
+  ADD KEY `idx_mcomments_user` (`user_id`);
+
+--
+-- Indexes for table `media_likes`
+--
+ALTER TABLE `media_likes`
+  ADD PRIMARY KEY (`media_id`,`user_id`),
+  ADD KEY `idx_mlikes_user` (`user_id`);
+
+--
+-- Indexes for table `news`
 --
 ALTER TABLE `news`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_news_game` (`game_id`);
 
 --
--- Indexy pre tabuľku `password_resets`
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_notif_user` (`user_id`,`is_read`),
+  ADD KEY `fk_notif_from` (`from_user_id`),
+  ADD KEY `idx_notif_media` (`media_id`);
+
+--
+-- Indexes for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`id`),
@@ -316,14 +437,14 @@ ALTER TABLE `password_resets`
   ADD KEY `fk_resets_user` (`user_id`);
 
 --
--- Indexy pre tabuľku `ratings`
+-- Indexes for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`user_id`,`game_id`),
   ADD KEY `idx_ratings_game` (`game_id`);
 
 --
--- Indexy pre tabuľku `sessions`
+-- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`),
@@ -331,14 +452,14 @@ ALTER TABLE `sessions`
   ADD KEY `idx_sessions_user` (`user_id`);
 
 --
--- Indexy pre tabuľku `tags`
+-- Indexes for table `tags`
 --
 ALTER TABLE `tags`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uq_tags_name` (`name`);
 
 --
--- Indexy pre tabuľku `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -346,96 +467,168 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `uq_users_email` (`email`);
 
 --
--- AUTO_INCREMENT pre exportované tabuľky
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pre tabuľku `changelog`
+-- AUTO_INCREMENT for table `changelog`
 --
 ALTER TABLE `changelog`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pre tabuľku `games`
+-- AUTO_INCREMENT for table `game_images`
+--
+ALTER TABLE `game_images`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `friendships`
+--
+ALTER TABLE `friendships`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `game_media`
+--
+ALTER TABLE `game_media`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT pre tabuľku `news`
+-- AUTO_INCREMENT for table `media_comments`
 --
-ALTER TABLE `news`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `media_comments`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pre tabuľku `password_resets`
+-- AUTO_INCREMENT for table `news`
+--
+ALTER TABLE `news`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT pre tabuľku `sessions`
+-- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT pre tabuľku `tags`
+-- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT pre tabuľku `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- Obmedzenie pre exportované tabuľky
+-- Constraints for dumped tables
 --
 
 --
--- Obmedzenie pre tabuľku `changelog`
+-- Constraints for table `changelog`
 --
 ALTER TABLE `changelog`
   ADD CONSTRAINT `fk_changelog_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
--- Obmedzenie pre tabuľku `favorites`
+-- Constraints for table `favorites`
 --
 ALTER TABLE `favorites`
   ADD CONSTRAINT `fk_favorites_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `game_tags`
+-- Constraints for table `friendships`
+--
+ALTER TABLE `friendships`
+  ADD CONSTRAINT `fk_friend_addressee` FOREIGN KEY (`addressee_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_friend_requester` FOREIGN KEY (`requester_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `game_images`
+--
+ALTER TABLE `game_images`
+  ADD CONSTRAINT `fk_game_images_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `game_media`
+--
+ALTER TABLE `game_media`
+  ADD CONSTRAINT `fk_media_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_media_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `game_tags`
 --
 ALTER TABLE `game_tags`
   ADD CONSTRAINT `fk_game_tags_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_game_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `news`
+-- Constraints for table `media_comments`
+--
+ALTER TABLE `media_comments`
+  ADD CONSTRAINT `fk_mcomments_media` FOREIGN KEY (`media_id`) REFERENCES `game_media` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_mcomments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `media_likes`
+--
+ALTER TABLE `media_likes`
+  ADD CONSTRAINT `fk_mlikes_media` FOREIGN KEY (`media_id`) REFERENCES `game_media` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_mlikes_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `news`
 --
 ALTER TABLE `news`
   ADD CONSTRAINT `fk_news_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE SET NULL;
 
 --
--- Obmedzenie pre tabuľku `password_resets`
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `fk_notif_from` FOREIGN KEY (`from_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notif_media` FOREIGN KEY (`media_id`) REFERENCES `game_media` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD CONSTRAINT `fk_resets_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `ratings`
+-- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD CONSTRAINT `fk_ratings_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_ratings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Obmedzenie pre tabuľku `sessions`
+-- Constraints for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;

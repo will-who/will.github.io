@@ -19,8 +19,11 @@
         }
     }
 
-    // Zapamätá si posledný zoznam (filter, tag, triedenie) pre "Back to games"
-    $_SESSION["list_url"] = track_url($view, $sort, $tag);
+    // Hľadanie hier podľa názvu (?q=...)
+    $search = trim(mb_substr((string)($_GET["q"] ?? ""), 0, 50, "UTF-8"));
+
+    // Zapamätá si posledný zoznam (filter, tag, hľadanie, triedenie) pre "Back to games"
+    $_SESSION["list_url"] = track_url($view, $sort, $tag, $search);
 
     $orderBy = $sort === "updated" ? "g.updated_at DESC, g.name ASC" : "g.name ASC";
     // obľúbené hry prihláseného používateľa idú vždy na začiatok (filter a triedenie platia ďalej)
@@ -29,12 +32,21 @@
     }
 
     // Hry z databázy (is_fav = 1, ak ich má prihlásený používateľ medzi obľúbenými)
-    $where = [];
+    $where  = [];
+    $types  = "i";          // prvý ? je $uid v LEFT JOIN favorites
+    $params = [$uid];
     if ($view === "favorites") {
         $where[] = "f.user_id IS NOT NULL";
     }
     if ($tag) {
-        $where[] = "EXISTS (SELECT 1 FROM game_tags gt WHERE gt.game_id = g.id AND gt.tag_id = ?)";
+        $where[]  = "EXISTS (SELECT 1 FROM game_tags gt WHERE gt.game_id = g.id AND gt.tag_id = ?)";
+        $types   .= "i";
+        $params[] = $tag;
+    }
+    if ($search !== "") {
+        $where[]  = "g.name LIKE ?";
+        $types   .= "s";
+        $params[] = "%" . addcslashes($search, "%_\\") . "%";
     }
 
     $sql = "SELECT g.id, g.name, g.image_back, g.image_front, g.image_size, g.image_position,
@@ -52,11 +64,7 @@
          . "ORDER BY " . $orderBy;
 
     $stmt = mysqli_prepare($conn, $sql);
-    if ($tag) {
-        mysqli_stmt_bind_param($stmt, "ii", $uid, $tag);
-    } else {
-        mysqli_stmt_bind_param($stmt, "i", $uid);
-    }
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
     mysqli_stmt_execute($stmt);
     $games = mysqli_stmt_get_result($stmt);
     $shownGames = mysqli_num_rows($games);
@@ -87,7 +95,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/jpeg" href="fav.jpg">
-    <title>LuLo Tracker</title>
+    <title>Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
 
@@ -108,7 +116,7 @@
                 HOME
             </a>
 
-            <a href="#">
+            <a href="friends.php">
                 FRIENDS
             </a>
 
@@ -129,15 +137,13 @@
             <a href="users.php" class="notification users-link" title="All users">👥</a>
             <?php endif; ?>
 
-            <button class="notification">
-                🕭
-            </button>
 
             <?php if ($user): ?>
 
-                <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
+                <?= bell_html($conn, $user) ?>
+            <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
 
-                <span class="username"><?= e($user["username"]) ?></span>
+                <a href="account.php" class="topbar-user" title="<?= e($user["username"]) ?>"><?= avatar_html($user["username"], $user["avatar"] ?? null, "avatar-sm") ?></a>
 
                 <form method="POST" action="logout.php" class="logout-form">
                     <?= csrf_field() ?>
@@ -169,16 +175,24 @@
 
         <aside class="sidebar">
 
-            <div class="search">
+            <form method="GET" action="track.php" class="search" role="search">
 
                 <input
                     type="text"
+                    name="q"
+                    value="<?= e($search) ?>"
+                    maxlength="50"
+                    autocomplete="off"
                     placeholder="Search games"
                 >
 
-                <span>⌕</span>
+                <?php if ($view !== "all"): ?><input type="hidden" name="view" value="<?= e($view) ?>"><?php endif; ?>
+                <?php if ($tag): ?><input type="hidden" name="tag" value="<?= (int)$tag ?>"><?php endif; ?>
+                <?php if ($sort !== "az"): ?><input type="hidden" name="sort" value="<?= e($sort) ?>"><?php endif; ?>
 
-            </div>
+                <button type="submit" aria-label="Search">⌕</button>
+
+            </form>
 
 
             <div class="menu">
@@ -227,7 +241,7 @@
                 <?php foreach ($allTags as $t): ?>
 
                 <a class="menu-item <?= $tag === (int)$t["id"] ? "selected" : "" ?>"
-                   href="<?= e(track_url($view, $sort, $tag === (int)$t["id"] ? 0 : $t["id"])) ?>">
+                   href="<?= e(track_url($view, $sort, $tag === (int)$t["id"] ? 0 : $t["id"], $search)) ?>">
 
                     <span>
                         <?= e($t["name"]) ?>
@@ -256,7 +270,7 @@
         <main class="content">
 
 
-            <?php if ($view === "all" && !$tag): ?>
+            <?php if ($view === "all" && !$tag && $search === ""): ?>
             <section class="news">
 
                 <div class="news-header">
@@ -332,10 +346,10 @@
                             <div class="dropdown-menu">
 
                                 <a class="<?= $sort === "az" ? "active" : "" ?>"
-                                   href="<?= e(track_url($view, "az", $tag)) ?>">A-Z</a>
+                                   href="<?= e(track_url($view, "az", $tag, $search)) ?>">A-Z</a>
 
                                 <a class="<?= $sort === "updated" ? "active" : "" ?>"
-                                   href="<?= e(track_url($view, "updated", $tag)) ?>">Last updated</a>
+                                   href="<?= e(track_url($view, "updated", $tag, $search)) ?>">Last updated</a>
 
                             </div>
 
@@ -348,6 +362,13 @@
             </div>
 
 
+
+            <?php if ($search !== ""): ?>
+            <p class="search-info">
+                Results for “<?= e($search) ?>” · <?= $shownGames ?> game<?= $shownGames === 1 ? "" : "s" ?>
+                · <a href="<?= e(track_url($view, $sort, $tag)) ?>">Clear search</a>
+            </p>
+            <?php endif; ?>
 
             <!-- =====================
                  GAME CARDS
@@ -372,6 +393,7 @@
                     <input type="hidden" name="view" value="<?= e($view) ?>">
                     <input type="hidden" name="sort" value="<?= e($sort) ?>">
                     <input type="hidden" name="tag" value="<?= (int)$tag ?>">
+                    <input type="hidden" name="q" value="<?= e($search) ?>">
                     <button type="submit"
                             class="star <?= $game["is_fav"] ? "" : "empty" ?>"
                             title="<?= $game["is_fav"] ? "Remove from favorites" : "Add to favorites" ?>">
@@ -428,11 +450,15 @@
 
                 <?php if ($shownGames === 0): ?>
                 <p class="empty-state">
-                    <?= $tag
-                        ? "No games with this tag."
-                        : ($view === "favorites"
-                            ? "You have no favorite games yet. Click the star on a game to add it."
-                            : "No games yet.") ?>
+                    <?php if ($search !== ""): ?>
+                        No games match “<?= e($search) ?>”.
+                    <?php elseif ($tag): ?>
+                        No games with this tag.
+                    <?php elseif ($view === "favorites"): ?>
+                        You have no favorite games yet. Click the star on a game to add it.
+                    <?php else: ?>
+                        No games yet.
+                    <?php endif; ?>
                 </p>
                 <?php endif; ?>
 

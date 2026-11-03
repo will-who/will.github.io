@@ -18,6 +18,7 @@
     $sort   = ($_POST["sort"] ?? "az") === "updated" ? "updated" : "az";
     $view   = ($_POST["view"] ?? "all") === "favorites" ? "favorites" : "all";
     $tag    = filter_input(INPUT_POST, "tag", FILTER_VALIDATE_INT) ?: 0;
+    $search = trim(mb_substr((string)($_POST["q"] ?? ""), 0, 50, "UTF-8"));
     $gameId = filter_input(INPUT_POST, "game_id", FILTER_VALIDATE_INT);
 
     if ($_SERVER["REQUEST_METHOD"] === "POST" && csrf_valid() && $gameId) {
@@ -41,7 +42,7 @@
         }
     }
 
-    header("Location: " . track_url($view, $sort, $tag) . ($gameId ? "#game-" . $gameId : ""));
+    header("Location: " . track_url($view, $sort, $tag, $search) . ($gameId ? "#game-" . $gameId : ""));
     exit;
 
 ?>
