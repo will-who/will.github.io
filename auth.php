@@ -192,9 +192,9 @@
     }
 
     // URL hlavnej stránky so zachovaným filtrom (view), tagom (tag), hľadaním (q) a triedením (sort)
-    function track_url($view = "all", $sort = "az", $tag = 0, $search = "") {
+    function track_url($view = "home", $sort = "az", $tag = 0, $search = "") {
         $params = [];
-        if ($view !== "all")  { $params["view"] = $view; }
+        if ($view !== "home") { $params["view"] = $view; }
         if ($tag)             { $params["tag"]  = (int)$tag; }
         if ($search !== "")   { $params["q"]    = $search; }
         if ($sort !== "az")   { $params["sort"] = $sort; }

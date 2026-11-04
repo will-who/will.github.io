@@ -5,13 +5,25 @@
 
     $entityLabels = ["game" => "Game", "news" => "News", "user" => "User"];
 
+    // Zmeny týkajúce sa používateľov (roly...) vidí len admin, editor ich nevidí
+    if (!is_admin($user)) {
+        unset($entityLabels["user"]);
+    }
+
     $filter = $_GET["type"] ?? "";
     if (!isset($entityLabels[$filter])) {
         $filter = "";
     }
 
+    $where = "";
+    if ($filter) {
+        $where = "WHERE entity = ? ";
+    } elseif (!is_admin($user)) {
+        $where = "WHERE entity <> 'user' ";
+    }
+
     $sql = "SELECT username, action, entity, entity_name, details, created_at FROM changelog "
-         . ($filter ? "WHERE entity = ? " : "")
+         . $where
          . "ORDER BY created_at DESC, id DESC LIMIT 500";
 
     $stmt = mysqli_prepare($conn, $sql);
@@ -27,7 +39,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpeg" href="fav.jpg">
+    <link rel="icon" type="image/png" href="icon.png">
     <title>Change log – Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
@@ -36,7 +48,7 @@
 
     <header class="topbar">
 
-        <a href="track.php" class="logo-link"><img src="logo.jpg" alt="Logo" class="topbar-logo"></a>
+        <a href="track.php" class="logo-link"><img src="icon.png" alt="Logo" class="topbar-logo"></a>
 
         <nav>
             <a href="track.php">HOME</a>

@@ -4,7 +4,15 @@
 
     // Filter (all / favorites) a triedenie (az / updated)
     $sort = ($_GET["sort"] ?? "az") === "updated" ? "updated" : "az";
-    $view = ($user && ($_GET["view"] ?? "all") === "favorites") ? "favorites" : "all";
+    // Zobrazenie: home (novinky + hry), games (len všetky hry), favorites (len obľúbené)
+    $reqView = $_GET["view"] ?? "home";
+    if ($reqView === "favorites" && $user) {
+        $view = "favorites";
+    } elseif ($reqView === "games") {
+        $view = "games";
+    } else {
+        $view = "home";
+    }
     $uid  = $user ? (int)$user["id"] : 0;
 
     // Tag z ľavého panela (?tag=ID) – platí len ak taký tag existuje
@@ -94,7 +102,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpeg" href="fav.jpg">
+    <link rel="icon" type="image/png" href="icon.png">
     <title>Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
@@ -108,7 +116,7 @@
 
     <header class="topbar">
 
-        <a href="track.php" class="logo-link"><img src="logo.jpg" alt="Logo" class="topbar-logo"></a>
+        <a href="track.php" class="logo-link"><img src="icon.png" alt="Logo" class="topbar-logo"></a>
 
         <nav>
 
@@ -186,7 +194,7 @@
                     placeholder="Search games"
                 >
 
-                <?php if ($view !== "all"): ?><input type="hidden" name="view" value="<?= e($view) ?>"><?php endif; ?>
+                <?php if ($view !== "home"): ?><input type="hidden" name="view" value="<?= e($view) ?>"><?php endif; ?>
                 <?php if ($tag): ?><input type="hidden" name="tag" value="<?= (int)$tag ?>"><?php endif; ?>
                 <?php if ($sort !== "az"): ?><input type="hidden" name="sort" value="<?= e($sort) ?>"><?php endif; ?>
 
@@ -197,8 +205,18 @@
 
             <div class="menu">
 
-                <a class="menu-item <?= ($view === "all" && !$tag) ? "selected" : "" ?>"
-                   href="<?= e(track_url("all", $sort)) ?>">
+                <a class="menu-item <?= ($view === "home" && !$tag && $search === "") ? "selected" : "" ?>"
+                   href="<?= e(track_url("home", $sort)) ?>">
+
+                    <span>
+                        Home page
+                    </span>
+
+                </a>
+
+
+                <a class="menu-item <?= ($view === "games" && !$tag) ? "selected" : "" ?>"
+                   href="<?= e(track_url("games", $sort)) ?>">
 
                     <span>
                         All Games
@@ -270,7 +288,7 @@
         <main class="content">
 
 
-            <?php if ($view === "all" && !$tag && $search === ""): ?>
+            <?php if ($view === "home" && !$tag && $search === ""): ?>
             <section class="news">
 
                 <div class="news-header">
@@ -325,7 +343,7 @@
                 <h1>
                     <?php if ($tag): ?>
                         <?= $view === "favorites" ? "Favorites – " : "" ?><?= e($tagName) ?>
-                    <?php elseif ($view === "favorites"): ?>Favorites<?php else: ?>All Games<?php endif; ?>
+                    <?php elseif ($view === "favorites"): ?>Favorites<?php elseif ($view === "games"): ?>All Games<?php else: ?>Games<?php endif; ?>
                 </h1>
 
 

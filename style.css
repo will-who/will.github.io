@@ -3329,3 +3329,10 @@ form.search {
 .search-info a {
     color: #d8dce2;
 }
+
+
+/* Logo (ikonka) v hornej lište: zaoblený štvorec, aby sa neorezal biely rámik */
+.topbar-logo {
+    border-radius: 10px;
+    object-fit: contain;
+}

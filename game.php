@@ -110,7 +110,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpeg" href="fav.jpg">
+    <link rel="icon" type="image/png" href="icon.png">
     <title><?= $game ? e($game["name"]) : "Game not found" ?> – Game Launcher</title>
     <link rel="stylesheet" href="style.css?v=<?= filemtime(__DIR__ . '/style.css') ?>">
 </head>
@@ -119,7 +119,7 @@
 
     <header class="topbar">
 
-        <a href="track.php" class="logo-link"><img src="logo.jpg" alt="Logo" class="topbar-logo"></a>
+        <a href="track.php" class="logo-link"><img src="icon.png" alt="Logo" class="topbar-logo"></a>
 
         <nav>
             <a href="track.php" class="active">HOME</a>
@@ -188,7 +188,7 @@
                     <?php if ($gameTags): ?>
                         <div class="game-tags">
                             <?php foreach ($gameTags as $t): ?>
-                                <a class="tag-chip" href="<?= e(track_url("all", "az", $t["id"])) ?>"><?= e($t["name"]) ?></a>
+                                <a class="tag-chip" href="<?= e(track_url("home", "az", $t["id"])) ?>"><?= e($t["name"]) ?></a>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>

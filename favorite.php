@@ -16,7 +16,7 @@
     }
 
     $sort   = ($_POST["sort"] ?? "az") === "updated" ? "updated" : "az";
-    $view   = ($_POST["view"] ?? "all") === "favorites" ? "favorites" : "all";
+    $view   = in_array($_POST["view"] ?? "", ["games", "favorites"], true) ? $_POST["view"] : "home";
     $tag    = filter_input(INPUT_POST, "tag", FILTER_VALIDATE_INT) ?: 0;
     $search = trim(mb_substr((string)($_POST["q"] ?? ""), 0, 50, "UTF-8"));
     $gameId = filter_input(INPUT_POST, "game_id", FILTER_VALIDATE_INT);
