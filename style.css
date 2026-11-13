@@ -3336,3 +3336,390 @@ form.search {
     border-radius: 10px;
     object-fit: contain;
 }
+
+
+/* Náhľad obrázka vo formulári na pridanie hry (rovnaký pomer strán ako karta hry) */
+.img-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 150px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto 18px;
+    padding: 12px;
+    border: 1px dashed #373d48;
+    border-radius: 6px;
+    background: #1b2029 center / cover no-repeat;
+    color: #737a86;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.img-preview.has-image {
+    border-style: solid;
+    border-color: #2b3039;
+}
+
+.img-preview.failed {
+    border-color: #6b2b2b;
+    color: #ff7272;
+}
+
+/* Náhľad obrázka novinky: rovnaký ako obrázok na stránke novinky (.news-article-image v article.php):
+   šírka 800 px (formulár je preto širší), výška 320 px, zaoblenie 6 px, obrázok vyplní celú plochu.
+   Pravidlá sú viazané na formulár (.news-form), takže fungujú nezávisle od ďalších tried náhľadu. */
+.news-form {
+    max-width: 840px;
+}
+
+.news-form .img-preview {
+    width: 100%;
+    height: 320px;
+    aspect-ratio: auto;
+    margin: 0 0 18px;
+    border-radius: 6px;
+}
+
+.news-form .img-preview.has-image {
+    border: none;
+    background-color: #2b3039;
+}
+
+
+/* =========================================================
+   ZVÝRAZNENIE (akcentová farba #b0f904):
+   na ktorej stránke som, čo je vybrané a ktoré pole je práve aktívne.
+   Zvyšok stránky ostáva tmavý.
+========================================================= */
+
+:root {
+    --accent: #b0f904;
+}
+
+/* podčiarknutie aktívnej stránky v hornom menu */
+nav a.active::after {
+    background: var(--accent);
+}
+
+/* aktívna ikonka v hornej lište (zmeny, používatelia, nastavenia) */
+.notification.active {
+    color: var(--accent);
+    box-shadow: inset 0 -3px 0 var(--accent);
+}
+
+/* vybraná položka v ľavom paneli (Home page, All Games, Favorites, tag) */
+.menu-item.selected {
+    border-left-color: var(--accent);
+}
+
+/* vybraná možnosť v rozbaľovacích zoznamoch (zoradenie, filter) */
+.dropdown-menu a.active,
+.sort-option.active {
+    color: var(--accent);
+}
+
+/* zaškrtnuté tagy vo formulári */
+.tag-picker label.tag-option:has(input:checked) {
+    border-color: var(--accent);
+}
+
+/* pole, v ktorom práve píšeš */
+.auth-box input:focus,
+.edit-form input:focus,
+.edit-form textarea:focus,
+.review-form textarea:focus,
+.search:focus-within {
+    border-color: var(--accent);
+}
+
+/* odkazy a texty v akcentovej farbe */
+.news-readmore,
+.news-manage,
+.back-link {
+    color: var(--accent);
+}
+
+/* tlačidlá LOGIN a LOGOUT v hornej lište: zelený rámik, pri prejdení myšou sa zväčšia a vyplnia farbou */
+.topbar-right .account-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-color: var(--accent);
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.topbar-right .account-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #10151f;
+    transform: scale(1.07);
+}
+
+/* ikonky: notifikácie (zvonček) a nastavenia (ozubené koliesko) */
+.notification {
+    color: var(--accent);
+}
+
+/* otvorená novinka: odkaz "View game page →" */
+.news-article-game-info span {
+    color: var(--accent);
+}
+
+/* tlačidlá pri klipoch a pri úprave hry: rovnaký štýl ako LOGIN / LOGOUT
+   (zelený rámik, pri prejdení myšou sa zväčšia a vyplnia farbou) */
+.media-add summary.account-button,
+.media-forms .account-button,
+.clip-comments .account-button,
+.account-button.edit-game-link,
+.edit-button,
+.content-header a.account-button[href^="game.php"],
+.gallery-add .account-button {
+    border-color: var(--accent);
+    transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.media-add summary.account-button:hover,
+.media-forms .account-button:hover,
+.clip-comments .account-button:hover,
+.account-button.edit-game-link:hover,
+.edit-button:hover,
+.content-header a.account-button[href^="game.php"]:hover,
+.gallery-add .account-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #10151f;
+    transform: scale(1.06);
+}
+
+
+/* =========================================================
+   VŠETKY TLAČIDLÁ: zelený rámik, pri prejdení myšou sa zväčšia a vyplnia farbou.
+   Tlačidlá na mazanie ostávajú červené (vyplnia sa na červeno), aby bolo jasné, že mažú.
+========================================================= */
+
+.account-button,
+.like-btn:not(.liked):not(.static),
+.bell-btn:not(.muted) {
+    border-color: var(--accent);
+    transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.account-button:hover,
+.like-btn:not(.liked):not(.static):hover,
+.bell-btn:not(.muted):hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #10151f;
+    transform: scale(1.06);
+}
+
+.like-btn.liked:hover {
+    transform: scale(1.06);
+}
+
+/* veľké tlačidlá na celú šírku (LOGIN, CREATE ACCOUNT, SAVE...): jemnejšie zväčšenie */
+.auth-submit {
+    box-shadow: inset 0 0 0 1px var(--accent);
+    transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.auth-submit:hover {
+    background: var(--accent);
+    color: #10151f;
+    transform: scale(1.03);
+}
+
+/* mazacie tlačidlá: červené */
+.account-button.danger:hover {
+    background: #d93f3f;
+    border-color: #d93f3f;
+    color: white;
+    transform: scale(1.06);
+}
+
+.danger-button {
+    box-shadow: inset 0 0 0 1px #d93f3f;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.danger-button:hover {
+    background: #d93f3f;
+    transform: scale(1.06);
+}
+
+
+/* =========================================================
+   STATY (Kills / Assists / Deaths)
+========================================================= */
+
+.stats-box {
+    max-width: 800px;
+    margin-top: 30px;
+    scroll-margin-top: 20px;
+}
+
+.stats-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.stats-head h2 {
+    margin-right: auto;
+}
+
+.stats-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 520px;
+    margin-top: 14px;
+    padding: 16px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.stats-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.stats-inputs label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #9ea5af;
+    font-size: 13px;
+}
+
+.stats-inputs input {
+    width: 110px;
+    padding: 9px 10px;
+    border: 1px solid #373d48;
+    border-radius: 4px;
+    outline: none;
+    background: #151922;
+    color: white;
+    font: inherit;
+}
+
+.stats-inputs input:focus {
+    border-color: var(--accent);
+}
+
+.stats-form .file-label {
+    color: #9ea5af;
+    font-size: 13px;
+}
+
+.stats-form input[type="file"] {
+    max-width: 100%;
+    color: #c6cad1;
+    font-size: 14px;
+}
+
+.stats-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 20px 0 14px;
+}
+
+.stats-summary > div {
+    min-width: 130px;
+    padding: 14px 16px;
+    background: #161c27;
+    border-radius: 6px;
+}
+
+.stats-summary strong {
+    display: block;
+    color: white;
+    font-size: 24px;
+}
+
+.stats-summary span {
+    display: block;
+    margin-top: 4px;
+    color: #8a909b;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.stats-summary small {
+    color: #737a86;
+    font-size: 12px;
+}
+
+.stats-section {
+    margin-top: 32px;
+    scroll-margin-top: 20px;
+}
+
+.stats-section h2 {
+    margin-bottom: 12px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #202833;
+    color: #bfc4cc;
+    font-size: 12px;
+}
+
+.status-badge.pending {
+    background: #3a2f12;
+    color: #ffd166;
+}
+
+.status-badge.approved {
+    background: #1d2a0c;
+    color: var(--accent);
+}
+
+.status-badge.rejected {
+    background: #3a1d1f;
+    color: #ff8a8a;
+}
+
+.shot-thumb {
+    display: block;
+    width: auto;
+    height: 56px;
+    border-radius: 4px;
+}
+
+.stats-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* počet čakajúcich štatov pri ikonke v hornej lište */
+.notification.users-link {
+    position: relative;
+}
+
+.icon-count {
+    position: absolute;
+    top: -2px;
+    right: -6px;
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #d93f3f;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 16px;
+    text-align: center;
+}

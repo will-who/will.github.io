@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 02, 2026 at 10:29 AM
+-- Generation Time: Nov 13, 2026 at 10:48 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,6 +38,32 @@ CREATE TABLE `changelog` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `changelog`
+--
+
+INSERT INTO `changelog` (`id`, `user_id`, `username`, `action`, `entity`, `entity_name`, `details`, `created_at`) VALUES
+(1, 9, 'Lubo', 'added', 'game', 'Fortnite', NULL, '2026-11-13 09:12:42'),
+(2, 9, 'Lubo', 'edited', 'game', 'Fortnite', 'image source changed', '2026-11-13 09:12:51'),
+(3, 9, 'Lubo', 'edited', 'game', 'Fortnite', 'image source changed', '2026-11-13 09:15:08'),
+(4, 9, 'Lubo', 'edited', 'game', 'Apex Legends', 'tags: First person shooter → First person shooter, Battle Royale', '2026-11-13 09:15:22'),
+(5, 9, 'Lubo', 'edited', 'game', 'Apex Legends', 'tags: First person shooter, Battle Royale → First person shooter, Team based shooter, Battle Royale', '2026-11-13 09:15:25'),
+(6, 9, 'Lubo', 'edited', 'game', 'Call of Duty Warzone', 'tags: First person shooter → First person shooter, Battle Royale', '2026-11-13 09:15:31'),
+(7, 9, 'Lubo', 'edited', 'game', 'Valorant', 'tags: First person shooter → First person shooter, Team based shooter', '2026-11-13 09:15:44'),
+(8, 9, 'Lubo', 'edited', 'game', 'Tom Clancy\'s Rainbow Six Siege', 'tags: First person shooter → First person shooter, Team based shooter', '2026-11-13 09:15:48'),
+(9, 9, 'Lubo', 'edited', 'game', 'Team Fortress 2', 'tags: First person shooter → First person shooter, Team based shooter', '2026-11-13 09:15:52'),
+(10, 9, 'Lubo', 'edited', 'game', 'Marvel Rivals', 'tags: Third person shooter → Third person shooter, Team based shooter', '2026-11-13 09:16:00'),
+(11, 9, 'Lubo', 'edited', 'game', 'Overwatch', 'tags: Team based shooter → First person shooter, Team based shooter', '2026-11-13 09:16:05'),
+(12, 9, 'Lubo', 'edited', 'game', 'Deadlock', 'tags: Third person shooter → Third person shooter, Team based shooter', '2026-11-13 09:16:10'),
+(13, 9, 'Lubo', 'deleted', 'news', 'Apex Legends will be great again', NULL, '2026-11-13 09:17:06'),
+(14, 9, 'Lubo', 'deleted', 'news', 'New deadlock update now has halloween', NULL, '2026-11-13 09:17:15'),
+(15, 9, 'Lubo', 'added', 'news', 'Apex Legends season 31', 'game: Apex Legends', '2026-11-13 09:20:31'),
+(16, 9, 'Lubo', 'edited', 'news', 'Apex Legends season 31', 'text changed', '2026-11-13 09:21:06'),
+(17, 9, 'Lubo', 'edited', 'news', 'Apex Legends season 31', 'text changed', '2026-11-13 09:22:43'),
+(18, 9, 'Lubo', 'added', 'news', 'Apex Legends Gozdilla Event', 'game: Apex Legends', '2026-11-13 09:23:51'),
+(19, 9, 'Lubo', 'added', 'news', 'Overwatch mid season 5 patch notes', 'game: Overwatch', '2026-11-13 09:26:37'),
+(20, 4, 'admin', 'approved', 'game', 'Overwatch', 'stats by Lubo: Kills 11, Assists 9, Deaths 13', '2026-11-13 09:41:13');
+
 -- --------------------------------------------------------
 
 --
@@ -55,7 +81,10 @@ CREATE TABLE `favorites` (
 --
 
 INSERT INTO `favorites` (`user_id`, `game_id`, `created_at`) VALUES
-(9, 9, '2026-11-02 09:27:58');
+(9, 3, '2026-11-13 09:08:56'),
+(9, 6, '2026-11-13 09:08:58'),
+(10, 2, '2026-11-13 09:08:44'),
+(10, 4, '2026-11-13 09:08:46');
 
 -- --------------------------------------------------------
 
@@ -95,14 +124,15 @@ CREATE TABLE `games` (
 --
 
 INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_size`, `image_position`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Overwatch', 'Team based shooter', 'https://blz-contentstack-images.akamaized.net/v3/assets/blta8f9a8e092360c6c/bltdf9dd58b1d2893d5/6ac5243232e6024d7dc0e46c/blizz_ow_nologo.png?format=webply&quality=80&auto=webp', 'https://blz-contentstack-images.akamaized.net/v3/assets/blta8f9a8e092360c6c/blt356e8885177e1b70/69839b1b9fc491040b9a15f9/logo_ow_enUS.png?format=webply&quality=80&auto=webp', 'cover', 'center', 'Team-based hero shooter where two teams fight over objectives. Pick a hero from the tank, damage or support roles and combine abilities with your team to win each match.', '2026-10-27 07:52:04', '2026-10-28 07:17:57'),
-(2, 'Marvel Rivals', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2767030/library_600x900_2x.jpg', NULL, 'cover', 'center', 'Fast 6v6 hero shooter featuring Marvel characters. Each hero has unique abilities and team-up powers, and the maps can be partly destroyed during the fight.', '2026-10-27 07:52:04', '2026-10-28 07:20:57'),
-(3, 'Apex Legends', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1172470/library_600x900.jpg', NULL, '120%', 'center', 'Free-to-play battle royale hero shooter from Respawn Entertainment. Squads drop onto the map, pick a Legend with unique abilities, loot weapons and fight to be the last squad standing.', '2026-10-27 08:35:53', '2026-10-28 07:20:48'),
-(4, 'Tom Clancy\'s Rainbow Six Siege', 'First person shooter', 'https://cdn.akamai.steamstatic.com/steam/apps/359550/library_600x900.jpg', NULL, 'cover', 'center', 'aksjclpsadmc[ozjv]oasc', '2026-10-27 10:38:19', '2026-10-27 12:47:26'),
-(6, 'Call of Duty Warzone', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1962663/library_600x900_2x.jpg', NULL, 'cover', 'center', NULL, '2026-10-27 13:01:00', '2026-10-28 07:13:40'),
-(7, 'Deadlock', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1422450/logo.png', NULL, 'contain', 'center', NULL, '2026-10-28 07:23:15', '2026-10-28 07:25:54'),
-(8, 'Team Fortress 2', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/440/library_600x900_2x.jpg', NULL, '100%', 'center', NULL, '2026-10-28 07:24:06', '2026-10-28 07:26:10'),
-(9, 'Valorant', 'First person shooter', 'https://www.riotgames.com/darkroom/900/82a04f6bf37d1258c3242713d926c50b:a9101749edc9242665d310a120d3f710/v26-a6-website-productcardvisual-840x1413.jpg', NULL, 'cover', 'center', NULL, '2026-10-28 07:24:17', '2026-10-28 07:30:41');
+(1, 'Overwatch', 'Team based shooter', 'https://blz-contentstack-images.akamaized.net/v3/assets/blta8f9a8e092360c6c/bltdf9dd58b1d2893d5/6ac5243232e6024d7dc0e46c/blizz_ow_nologo.png?format=webply&quality=80&auto=webp', 'https://blz-contentstack-images.akamaized.net/v3/assets/blta8f9a8e092360c6c/blt356e8885177e1b70/69839b1b9fc491040b9a15f9/logo_ow_enUS.png?format=webply&quality=80&auto=webp', 'cover', 'center', 'Team-based hero shooter where two teams fight over objectives. Pick a hero from the tank, damage or support roles and combine abilities with your team to win each match.', '2026-10-27 07:52:04', '2026-11-13 09:16:05'),
+(2, 'Marvel Rivals', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2767030/library_600x900_2x.jpg', NULL, 'cover', 'center', 'Fast 6v6 hero shooter featuring Marvel characters. Each hero has unique abilities and team-up powers, and the maps can be partly destroyed during the fight.', '2026-10-27 07:52:04', '2026-11-13 09:16:00'),
+(3, 'Apex Legends', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1172470/library_600x900.jpg', NULL, '120%', 'center', 'Free-to-play battle royale hero shooter from Respawn Entertainment. Squads drop onto the map, pick a Legend with unique abilities, loot weapons and fight to be the last squad standing.', '2026-10-27 08:35:53', '2026-11-13 09:15:25'),
+(4, 'Tom Clancy\'s Rainbow Six Siege', 'First person shooter', 'https://cdn.akamai.steamstatic.com/steam/apps/359550/library_600x900.jpg', NULL, 'cover', 'center', 'aksjclpsadmc[ozjv]oasc', '2026-10-27 10:38:19', '2026-11-13 09:15:48'),
+(6, 'Call of Duty Warzone', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1962663/library_600x900_2x.jpg', NULL, 'cover', 'center', NULL, '2026-10-27 13:01:00', '2026-11-13 09:15:31'),
+(7, 'Deadlock', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1422450/logo.png', NULL, 'contain', 'center', NULL, '2026-10-28 07:23:15', '2026-11-13 09:16:10'),
+(8, 'Team Fortress 2', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/440/library_600x900_2x.jpg', NULL, '100%', 'center', NULL, '2026-10-28 07:24:06', '2026-11-13 09:15:52'),
+(9, 'Valorant', 'First person shooter', 'https://www.riotgames.com/darkroom/900/82a04f6bf37d1258c3242713d926c50b:a9101749edc9242665d310a120d3f710/v26-a6-website-productcardvisual-840x1413.jpg', NULL, 'cover', 'center', NULL, '2026-10-28 07:24:17', '2026-11-13 09:15:44'),
+(10, 'Fortnite', NULL, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSixtHmmBtBNoiDq7Yn51QEYF6jPoM0gTmlxMHL5VAPC-0Y0HfjUItTN94&s=10', NULL, 'cover', 'center', NULL, '2026-11-13 09:12:42', '2026-11-13 09:15:08');
 
 -- --------------------------------------------------------
 
@@ -137,6 +167,34 @@ CREATE TABLE `game_media` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `game_stats`
+--
+
+CREATE TABLE `game_stats` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `game_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `nickname` varchar(40) NOT NULL DEFAULT '',
+  `kills` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `assists` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `deaths` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `screenshot` varchar(255) NOT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `reviewed_by` int(10) UNSIGNED DEFAULT NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `game_stats`
+--
+
+INSERT INTO `game_stats` (`id`, `game_id`, `user_id`, `nickname`, `kills`, `assists`, `deaths`, `screenshot`, `status`, `reviewed_by`, `reviewed_at`, `created_at`) VALUES
+(1, 1, 9, '', 11, 9, 13, 'stat_1_9_f19737ca7879641e.jpg', 'approved', 4, '2026-11-13 09:41:13', '2026-11-13 09:35:33');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `game_tags`
 --
 
@@ -150,14 +208,25 @@ CREATE TABLE `game_tags` (
 --
 
 INSERT INTO `game_tags` (`game_id`, `tag_id`) VALUES
+(1, 1),
 (1, 3),
 (2, 2),
+(2, 3),
 (3, 1),
+(3, 3),
+(3, 4),
 (4, 1),
+(4, 3),
 (6, 1),
+(6, 4),
 (7, 2),
+(7, 3),
 (8, 1),
-(9, 1);
+(8, 3),
+(9, 1),
+(9, 3),
+(10, 2),
+(10, 4);
 
 -- --------------------------------------------------------
 
@@ -205,9 +274,10 @@ CREATE TABLE `news` (
 -- Dumping data for table `news`
 --
 
-INSERT INTO `news` (`id`, `title`, `body`, `image`, `created_at`, `updated_at`) VALUES
-(1, 'Apex Legends will be great again', 'EPIC NEWS!!!!\r\nNext season lifeline is getting shield revive again', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCdI299kjsJd3wXRHLt15-KsuSQzI8RLX5ODiHEYVaJA&s=10', '2026-11-02 09:21:41', '2026-11-02 09:21:41'),
-(2, 'New deadlock update now has halloween', 'yup', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrMkjc1jDduAhdmMC0tT2H__ihReHSmx_xjfSjfIQyQ&s=10', '2026-11-02 09:22:17', '2026-11-02 09:22:17');
+INSERT INTO `news` (`id`, `title`, `body`, `image`, `game_id`, `created_at`, `updated_at`) VALUES
+(6, 'Apex Legends season 31', 'Apex Legends Season 31 \"Cipher\" launched on November 3, 2026. Key updates include a Crypto rework featuring a faster, 25-second battery drone with lingering 8-second enemy scans, alongside the return of Akimbo Heavy Wingmans. For competitive play, Diamond+ Ranked matches now feature pre-match Legend', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4u4BOm8N6bpTbKjRO-GU19z4npjn9YsJgoh16w3w2KA&s=10', 3, '2026-11-13 09:20:31', '2026-11-13 09:22:43'),
+(7, 'Apex Legends Gozdilla Event', 'The Apex Legends | Godzilla Event runs from November 10 to December 1, 2026. Godzilla looms over Storm Point in Wildcard mode, periodically firing devastating Heat Rays into marked blast zones where players can brave the danger to loot a Care Package containing a custom Heat Ray Devotion that tracks', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThPhlZPgoT32mZAcJJJWbOqHj_e9RQN8gwtzpA_g7WKQ&s=10', 3, '2026-11-13 09:23:51', '2026-11-13 09:23:51'),
+(8, 'Overwatch mid season 5 patch notes', 'The November 2026 Overwatch patches (Nov 3 & Nov 5) adjusted Stadium mode powers for Winston, Cassidy, Genji, Sojourn, and Vendetta, fixed skin and hero movement bugs (Sierra, Juno, D.Mon, Mizuki), increased Wrecking Ball\'s Grappling Claw retraction speed cap by 15%, and introduced the Taking Reign', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-1uotNlcWeX3y24mhNk7l5fBmlqs_wLNmMOXfSM9hQg&s=10', 1, '2026-11-13 09:26:37', '2026-11-13 09:26:37');
 
 -- --------------------------------------------------------
 
@@ -291,7 +361,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
-(20, 9, 'e1ab5dfbb4503b7aca4721ab5d6c776776d939d79752fe5d5d58e13bfc933993', '::1', '2026-11-02 09:26:33', '2026-11-09 10:26:33');
+(31, 9, '687eae00c46b187ba625a9c431fed0caffb81c31059b11ac3475293980b48d2f', '::1', '2026-11-13 09:43:06', '2026-11-20 10:43:06');
 
 -- --------------------------------------------------------
 
@@ -336,10 +406,11 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_active`, `created_at`, `last_login`) VALUES
-(4, 'admin', 'lubkobernhauser2@gmail.com', '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-02 09:20:07'),
-(7, 'user', 'amaha1337@centrum.sk', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'user', 1, '2026-11-02 09:05:58', '2026-11-02 09:23:28'),
-(9, 'user2', 'luboslav.berny@gmail.com', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'user', 1, '2026-11-02 09:19:08', '2026-11-02 09:26:33');
+INSERT INTO `users` (`id`, `username`, `email`, `avatar`, `password_hash`, `role`, `is_active`, `created_at`, `last_login`) VALUES
+(4, 'admin', 'lubkobernhauser2@gmail.com', NULL, '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-13 09:42:48'),
+(7, 'Vilo', 'amaha1337@centrum.sk', '7_b76f497fd062070b.jpg', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'editor', 1, '2026-11-02 09:05:58', '2026-11-13 09:09:52'),
+(9, 'Lubo', 'luboslav.berny@gmail.com', '9_aaf9b28f202706e7.png', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'editor', 1, '2026-11-02 09:19:08', '2026-11-13 09:43:06'),
+(10, 'user', 'doge.pink123@gmail.com', NULL, '$2y$10$hk.2bAO6Kl.XiIqHRr0x1.nZ4OwxkOUsziC41ND6MYCAtaRBzVz8O', 'user', 1, '2026-11-13 09:08:37', '2026-11-13 09:08:37');
 
 --
 -- Indexes for dumped tables
@@ -389,6 +460,16 @@ ALTER TABLE `game_media`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_media_game` (`game_id`),
   ADD KEY `idx_media_user` (`user_id`);
+
+--
+-- Indexes for table `game_stats`
+--
+ALTER TABLE `game_stats`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_stats_game` (`game_id`,`status`),
+  ADD KEY `idx_stats_user` (`user_id`),
+  ADD KEY `idx_stats_status` (`status`,`created_at`),
+  ADD KEY `fk_stats_reviewer` (`reviewed_by`);
 
 --
 -- Indexes for table `game_tags`
@@ -474,18 +555,24 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `changelog`
 --
 ALTER TABLE `changelog`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `game_images`
---
-ALTER TABLE `game_images`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `friendships`
 --
 ALTER TABLE `friendships`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `games`
+--
+ALTER TABLE `games`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `game_images`
+--
+ALTER TABLE `game_images`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -495,10 +582,10 @@ ALTER TABLE `game_media`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `games`
+-- AUTO_INCREMENT for table `game_stats`
 --
-ALTER TABLE `games`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+ALTER TABLE `game_stats`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `media_comments`
@@ -510,7 +597,7 @@ ALTER TABLE `media_comments`
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -528,7 +615,7 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -540,7 +627,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -578,6 +665,14 @@ ALTER TABLE `game_images`
 ALTER TABLE `game_media`
   ADD CONSTRAINT `fk_media_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_media_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `game_stats`
+--
+ALTER TABLE `game_stats`
+  ADD CONSTRAINT `fk_stats_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_stats_reviewer` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_stats_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `game_tags`

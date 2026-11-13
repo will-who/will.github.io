@@ -201,6 +201,9 @@
                    placeholder="https://… or img/news.png"
                    value="<?= e($form["image"]) ?>">
 
+            <label>Preview</label>
+            <div class="img-preview news-preview" id="imagePreview">Paste an image link to see a preview</div>
+
             <label for="game_id">Game (shown when the news is opened)</label>
             <select id="game_id" name="game_id" class="news-select">
                 <option value="0">— no game —</option>
@@ -254,6 +257,51 @@
         </div>
 
     </main>
+
+    <script>
+        // Náhľad obrázka: po napísaní odkazu sa po chvíli ukáže, ako bude obrázok vyzerať na karte hry.
+        (function () {
+            var input = document.getElementById("image");
+            var box   = document.getElementById("imagePreview");
+            var timer = null;
+
+            if (!input || !box) { return; }
+
+            function update() {
+                var v = input.value.trim();
+
+                box.style.backgroundImage = "none";
+                box.classList.remove("has-image", "failed");
+
+                if (v === "") {
+                    box.textContent = "Paste an image link to see a preview";
+                    return;
+                }
+
+                box.textContent = "Loading…";
+
+                var img = new Image();
+                img.onload = function () {
+                    if (input.value.trim() !== v) { return; }
+                    box.style.backgroundImage = "url(" + JSON.stringify(v) + ")";
+                    box.classList.add("has-image");
+                    box.textContent = "";
+                };
+                img.onerror = function () {
+                    if (input.value.trim() !== v) { return; }
+                    box.classList.add("failed");
+                    box.textContent = "This image could not be loaded";
+                };
+                img.src = v;
+            }
+
+            input.addEventListener("input", function () {
+                clearTimeout(timer);
+                timer = setTimeout(update, 400);
+            });
+            update();
+        })();
+    </script>
 
 </body>
 </html>

@@ -582,6 +582,46 @@
         return preg_match('/^[A-Za-z0-9_.\-]{1,120}$/', (string)$file) ? MEDIA_DIR . "/" . $file : "";
     }
 
+    /* ---------- Staty k hrám (Kills / Assists / Deaths) ---------- */
+
+    const STATS_DIR = "uploads/stats";
+
+    // Staty, ktoré sa dajú pridávať. Kľúč = názov stĺpca v tabuľke game_stats, hodnota = popis.
+    // Nový stat: pridaj do game_stats stĺpec (INT UNSIGNED NOT NULL DEFAULT 0) a jeden riadok sem.
+    const STAT_FIELDS = ["kills" => "Kills", "assists" => "Assists", "deaths" => "Deaths"];
+
+    // Bezpečná cesta k screenshotu k statom alebo ""
+    function stat_src($file) {
+        return preg_match('/^[A-Za-z0-9_.\-]{1,120}$/', (string)$file) ? STATS_DIR . "/" . $file : "";
+    }
+
+    // "Kills 10, Assists 2, Deaths 5"
+    function stat_line($row) {
+        $parts = [];
+        foreach (STAT_FIELDS as $key => $label) {
+            $parts[] = $label . " " . (int)($row[$key] ?? 0);
+        }
+        return implode(", ", $parts);
+    }
+
+    // Kills / Deaths (ak je deaths 0, delí sa jednotkou)
+    function stat_kd($kills, $deaths) {
+        return number_format($kills / max(1, $deaths), 2);
+    }
+
+    function pending_stats_count($conn) {
+        return (int)mysqli_fetch_row(mysqli_query($conn,
+            "SELECT COUNT(*) FROM game_stats WHERE status = 'pending'"))[0];
+    }
+
+    // Ikonka pre admina v hornej lište: odkaz na kontrolu staty čakajúcich na schválenie
+    function stats_icon_html($conn, $active = false) {
+        $n = pending_stats_count($conn);
+        return '<a href="stats-review.php" class="notification users-link' . ($active ? ' active' : '') . '"'
+             . ' title="Stats review' . ($n ? ' (' . $n . ' pending)' : '') . '">📊'
+             . ($n ? '<span class="icon-count">' . $n . '</span>' : '') . '</a>';
+    }
+
     function e($s) {
         return htmlspecialchars($s, ENT_QUOTES, "UTF-8");
     }

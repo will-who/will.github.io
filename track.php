@@ -143,6 +143,7 @@
 
             <?php if (is_admin($user)): ?>
             <a href="users.php" class="notification users-link" title="All users">👥</a>
+            <?= stats_icon_html($conn) ?>
             <?php endif; ?>
 
 

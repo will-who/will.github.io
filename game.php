@@ -101,6 +101,31 @@
     $mediaFlash = $_SESSION["media_flash"] ?? null;
     unset($_SESSION["media_flash"]);
 
+    // Staty: schválené záznamy, moje čakajúce a (pre admina) všetky čakajúce
+    $statsFlash = $_SESSION["stats_flash"] ?? null;
+    unset($_SESSION["stats_flash"]);
+    $approvedStats   = 0;
+    $myPendingStats  = 0;
+    $pendingStatsAll = 0;
+
+    if ($game) {
+        $stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM game_stats WHERE game_id = ? AND status = 'approved'");
+        mysqli_stmt_bind_param($stmt, "i", $game["id"]);
+        mysqli_stmt_execute($stmt);
+        $approvedStats = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+
+        if ($user && !is_admin($user)) {
+            $stmt = mysqli_prepare($conn,
+                "SELECT COUNT(*) FROM game_stats WHERE game_id = ? AND user_id = ? AND status = 'pending'");
+            mysqli_stmt_bind_param($stmt, "ii", $game["id"], $user["id"]);
+            mysqli_stmt_execute($stmt);
+            $myPendingStats = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+        }
+        if (is_admin($user)) {
+            $pendingStatsAll = pending_stats_count($conn);
+        }
+    }
+
     $imgBack  = $game ? img_url($game["image_back"])  : "";
     $imgFront = $game ? img_url($game["image_front"]) : "";
 
@@ -239,6 +264,69 @@
 
             </section>
             <?php endif; ?>
+
+
+            <section class="stats-box" id="stats">
+
+                <div class="stats-head">
+                    <h2>Stats</h2>
+
+                    <a class="account-button" href="game-stats.php?id=<?= (int)$game["id"] ?>">VIEW STATS (<?= $approvedStats ?>)</a>
+
+                    <?php if (is_admin($user)): ?>
+                    <a class="account-button" href="stats-review.php">REVIEW STATS<?= $pendingStatsAll ? " (" . $pendingStatsAll . ")" : "" ?></a>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($statsFlash): ?>
+                    <div class="flash-msg <?= $statsFlash[0] === "ok" ? "ok" : "error" ?>"><?= e($statsFlash[1]) ?></div>
+                <?php endif; ?>
+
+                <?php if (!$user): ?>
+
+                    <p class="rating-meta"><a href="login.php">Log in</a> to add your stats.</p>
+
+                <?php elseif (is_admin($user)): ?>
+
+                    <p class="rating-meta">Admin accounts review stats, they cannot add them.</p>
+
+                <?php else: ?>
+
+                    <?php if ($myPendingStats): ?>
+                    <p class="rating-meta">You have <?= $myPendingStats ?> stat<?= $myPendingStats === 1 ? "" : "s" ?> waiting for admin approval.
+                        <a href="game-stats.php?id=<?= (int)$game["id"] ?>#mine">See your submissions</a></p>
+                    <?php endif; ?>
+
+                    <details class="media-add">
+                        <summary class="account-button">+ ADD YOUR STATS</summary>
+
+                        <form method="POST" action="stats.php" enctype="multipart/form-data" class="stats-form">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="action" value="submit">
+                            <input type="hidden" name="game_id" value="<?= (int)$game["id"] ?>">
+
+                            <div class="stats-inputs">
+                                <?php foreach (STAT_FIELDS as $key => $label): ?>
+                                <label for="stat_<?= e($key) ?>"><?= e($label) ?>
+                                    <input type="number" id="stat_<?= e($key) ?>" name="stat[<?= e($key) ?>]"
+                                           min="0" max="99999" step="1" value="0" required>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <label class="file-label" for="stat_shot">Screenshot as proof (required, JPG, PNG, GIF or WEBP, max 5 MB)</label>
+                            <input type="file" id="stat_shot" name="screenshot"
+                                   accept="image/jpeg,image/png,image/gif,image/webp" required>
+
+                            <p class="rating-meta">An admin has to approve your stats before they show up.</p>
+
+                            <button type="submit" class="account-button">SUBMIT STATS</button>
+                        </form>
+                    </details>
+
+                <?php endif; ?>
+
+            </section>
 
 
             <section class="media" id="media">

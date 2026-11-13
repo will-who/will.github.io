@@ -93,6 +93,7 @@
 
             <a href="changelog.php" class="notification users-link" title="Change log">📜</a>
             <a href="users.php" class="notification users-link active" title="All users">👥</a>
+            <?= stats_icon_html($conn) ?>
 
             <?= bell_html($conn, $user) ?>
             <a href="settings.php" class="notification users-link" title="Settings">⚙</a>
