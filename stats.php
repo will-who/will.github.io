@@ -28,6 +28,42 @@
         exit;
     }
 
+    // Uloží jeden nahraný obrázok z poľa $field. Vráti [názov súboru, null] alebo [null, text chyby].
+    function save_stat_image($field, $what, $gameId, $uid) {
+        $f     = $_FILES[$field] ?? null;
+        $types = [IMAGETYPE_JPEG => "jpg", IMAGETYPE_PNG => "png", IMAGETYPE_GIF => "gif", IMAGETYPE_WEBP => "webp"];
+        $dir   = __DIR__ . "/" . STATS_DIR;
+
+        if (!$f || $f["error"] === UPLOAD_ERR_NO_FILE) {
+            return [null, $what . " is required."];
+        }
+        if (in_array($f["error"], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) || $f["size"] > 5 * 1024 * 1024) {
+            return [null, $what . ": the image is too large (max 5 MB)."];
+        }
+        if ($f["error"] !== UPLOAD_ERR_OK) {
+            return [null, $what . ": upload failed, try again."];
+        }
+
+        $info = @getimagesize($f["tmp_name"]);
+
+        if (!$info || !isset($types[$info[2]])) {
+            return [null, $what . ": only JPG, PNG, GIF or WEBP images are allowed."];
+        }
+        if ($info[0] > 8000 || $info[1] > 8000) {
+            return [null, $what . ": the image is too big (max 8000 × 8000 px)."];
+        }
+        if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
+            return [null, "Could not create the upload folder."];
+        }
+
+        $name = "stat_" . $gameId . "_" . $uid . "_" . bin2hex(random_bytes(8)) . "." . $types[$info[2]];
+
+        if (!move_uploaded_file($f["tmp_name"], $dir . "/" . $name)) {
+            return [null, "Could not save the image."];
+        }
+        return [$name, null];
+    }
+
     if (!csrf_valid()) {
         stats_flash("error", "Invalid form, please try again.");
         stats_done($back);
@@ -40,10 +76,12 @@
     }
 
     // hra musí existovať
-    $stmt = mysqli_prepare($conn, "SELECT id FROM games WHERE id = ? LIMIT 1");
+    $stmt = mysqli_prepare($conn, "SELECT id, name FROM games WHERE id = ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, "i", $gameId);
     mysqli_stmt_execute($stmt);
-    if (!mysqli_fetch_row(mysqli_stmt_get_result($stmt))) {
+    $gameRow = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
+    if (!$gameRow) {
         header("Location: track.php");
         exit;
     }
@@ -57,7 +95,7 @@
         $sid = filter_input(INPUT_POST, "stat_id", FILTER_VALIDATE_INT);
 
         $stmt = mysqli_prepare($conn,
-            "SELECT id, screenshot FROM game_stats
+            "SELECT id, screenshot, rank_screenshot FROM game_stats
               WHERE id = ? AND user_id = ? AND game_id = ? AND status = 'pending' LIMIT 1");
         mysqli_stmt_bind_param($stmt, "iii", $sid, $uid, $gameId);
         mysqli_stmt_execute($stmt);
@@ -68,8 +106,10 @@
             mysqli_stmt_bind_param($stmt, "i", $row["id"]);
             mysqli_stmt_execute($stmt);
 
-            if (stat_src($row["screenshot"]) !== "") {
-                @unlink(__DIR__ . "/" . stat_src($row["screenshot"]));
+            foreach ([$row["screenshot"], $row["rank_screenshot"]] as $file) {
+                if (stat_src($file) !== "") {
+                    @unlink(__DIR__ . "/" . stat_src($file));
+                }
             }
             stats_flash("ok", "Submission cancelled.");
         } else {
@@ -80,14 +120,53 @@
 
     /* ---------- Nové staty ---------- */
 
+    // režim: Quick play alebo Ranked
+    $mode = (string)($_POST["mode"] ?? "");
+
+    if (!array_key_exists($mode, STAT_MODES)) {
+        stats_flash("error", "Choose Quick play or Ranked.");
+        stats_done($back);
+    }
+
+    // nick v hre je povinný (bez riadiacich znakov, najviac 40 znakov)
+    $nick = trim(preg_replace('/[\x00-\x1F\x7F]+/u', "", (string)($_POST["nickname"] ?? "")));
+
+    if ($nick === "") {
+        stats_flash("error", "Enter your nickname from the game.");
+        stats_done($back);
+    }
+    if (mb_strlen($nick, "UTF-8") > 40) {
+        stats_flash("error", "The nickname is too long (max 40 characters).");
+        stats_done($back);
+    }
+
+    // meno postavy: povinné okrem hier, kde sa postava nevyberá (Call of Duty, Fortnite)
+    $character = "";
+
+    if (game_needs_character($gameRow["name"])) {
+        $character = trim(preg_replace('/[\x00-\x1F\x7F]+/u', "", (string)($_POST["character"] ?? "")));
+
+        if ($character === "") {
+            stats_flash("error", "Enter the name of the character you played.");
+            stats_done($back);
+        }
+        if (mb_strlen($character, "UTF-8") > 60) {
+            stats_flash("error", "The character name is too long (max 60 characters).");
+            stats_done($back);
+        }
+    }
+
+    // staty pre túto hru a tento režim (napr. Apex: knocks, damage, pri Ranked aj RP)
+    $fields = stat_fields_for($gameRow["name"], $mode);
     $posted = is_array($_POST["stat"] ?? null) ? $_POST["stat"] : [];
     $values = [];
 
-    foreach (STAT_FIELDS as $key => $label) {
-        $n = filter_var($posted[$key] ?? "", FILTER_VALIDATE_INT, ["options" => ["min_range" => 0, "max_range" => 99999]]);
+    foreach ($fields as $key => $label) {
+        [, $min, $max] = STAT_COLUMNS[$key];
+        $n = filter_var($posted[$key] ?? "", FILTER_VALIDATE_INT, ["options" => ["min_range" => $min, "max_range" => $max]]);
 
         if ($n === false) {
-            stats_flash("error", $label . " must be a whole number from 0 to 99999.");
+            stats_flash("error", $label . " must be a whole number from " . $min . " to " . $max . ".");
             stats_done($back);
         }
         $values[$key] = $n;
@@ -103,58 +182,43 @@
         stats_done($back);
     }
 
-    // screenshot je povinný
-    $f     = $_FILES["screenshot"] ?? null;
-    $types = [IMAGETYPE_JPEG => "jpg", IMAGETYPE_PNG => "png", IMAGETYPE_GIF => "gif", IMAGETYPE_WEBP => "webp"];
-    $dir   = __DIR__ . "/" . STATS_DIR;
+    // screenshot so statmi je povinný vždy
+    [$shot, $err] = save_stat_image("screenshot", "A screenshot of your stats", $gameId, $uid);
 
-    if (!$f || $f["error"] === UPLOAD_ERR_NO_FILE) {
-        stats_flash("error", "A screenshot is required as proof of your stats.");
-        stats_done($back);
-    }
-    if (in_array($f["error"], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) || $f["size"] > 5 * 1024 * 1024) {
-        stats_flash("error", "The image is too large (max 5 MB).");
-        stats_done($back);
-    }
-    if ($f["error"] !== UPLOAD_ERR_OK) {
-        stats_flash("error", "Upload failed, try again.");
+    if ($err) {
+        stats_flash("error", $err);
         stats_done($back);
     }
 
-    $info = @getimagesize($f["tmp_name"]);
+    // screenshot postupu v ranku je voliteľný (len pri Ranked)
+    $rankShot = null;
 
-    if (!$info || !isset($types[$info[2]])) {
-        stats_flash("error", "Only JPG, PNG, GIF or WEBP images are allowed.");
-        stats_done($back);
-    }
-    if ($info[0] > 8000 || $info[1] > 8000) {
-        stats_flash("error", "The image is too big (max 8000 × 8000 px).");
-        stats_done($back);
-    }
-    if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
-        stats_flash("error", "Could not create the upload folder.");
-        stats_done($back);
-    }
+    if ($mode === "ranked" && ($_FILES["rank_screenshot"]["error"] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+        [$rankShot, $err] = save_stat_image("rank_screenshot", "The rank progress screenshot", $gameId, $uid);
 
-    $name = "stat_" . $gameId . "_" . $uid . "_" . bin2hex(random_bytes(8)) . "." . $types[$info[2]];
-
-    if (!move_uploaded_file($f["tmp_name"], $dir . "/" . $name)) {
-        stats_flash("error", "Could not save the image.");
-        stats_done($back);
+        if ($err) {
+            @unlink(__DIR__ . "/" . STATS_DIR . "/" . $shot);
+            stats_flash("error", $err);
+            stats_done($back);
+        }
     }
 
     try {
-        $cols = array_keys(STAT_FIELDS);       // názvy stĺpcov pochádzajú z konštanty, nie od používateľa
+        $cols = array_keys($fields);           // názvy stĺpcov pochádzajú z konštanty, nie od používateľa
         $stmt = mysqli_prepare($conn,
-            "INSERT INTO game_stats (game_id, user_id, screenshot, " . implode(", ", $cols) . ")
-             VALUES (?, ?, ?, " . implode(", ", array_fill(0, count($cols), "?")) . ")");
-        mysqli_stmt_bind_param($stmt, "iis" . str_repeat("i", count($cols)), $gameId, $uid, $name, ...array_values($values));
+            "INSERT INTO game_stats (game_id, user_id, nickname, character_name, `mode`, screenshot, rank_screenshot, " . implode(", ", $cols) . ")
+             VALUES (?, ?, ?, ?, ?, ?, ?, " . implode(", ", array_fill(0, count($cols), "?")) . ")");
+        mysqli_stmt_bind_param($stmt, "iisssss" . str_repeat("i", count($cols)),
+                               $gameId, $uid, $nick, $character, $mode, $shot, $rankShot, ...array_values($values));
         mysqli_stmt_execute($stmt);
 
         stats_flash("ok", "Thanks, your stats were sent. They show up after an admin approves them.");
     }
     catch (mysqli_sql_exception $ex) {
-        @unlink($dir . "/" . $name);
+        @unlink(__DIR__ . "/" . STATS_DIR . "/" . $shot);
+        if ($rankShot) {
+            @unlink(__DIR__ . "/" . STATS_DIR . "/" . $rankShot);
+        }
         stats_flash("error", "Could not save your stats, try again later.");
     }
 

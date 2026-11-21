@@ -3,9 +3,9 @@
     include("auth.php");
     $user = require_admin($conn);
 
-    $keys    = array_keys(STAT_FIELDS);
+    // názvy stĺpcov pochádzajú z konštanty (bezpečné do SQL)
     $columns = "";
-    foreach ($keys as $k) {
+    foreach (array_keys(STAT_COLUMNS) as $k) {
         $columns .= ", s.`" . $k . "`";
     }
 
@@ -24,7 +24,7 @@
         }
         else {
             $stmt = mysqli_prepare($conn,
-                "SELECT s.id, s.game_id, g.name AS game_name, u.username" . $columns . "
+                "SELECT s.id, s.game_id, s.user_id, s.nickname, s.character_name, s.mode, g.name AS game_name, u.username" . $columns . "
                    FROM game_stats s
                    JOIN games g ON g.id = s.game_id
                    JOIN users u ON u.id = s.user_id
@@ -36,7 +36,7 @@
             if (!$row) {
                 flash("error", "This submission was already reviewed or no longer exists.");
             } else {
-                $status = $action === "approve" ? "approved" : "rejected";
+                $status  = $action === "approve" ? "approved" : "rejected";
                 $adminId = (int)$user["id"];
 
                 $stmt = mysqli_prepare($conn,
@@ -47,7 +47,14 @@
 
                 if (mysqli_stmt_affected_rows($stmt) > 0) {
                     log_change($conn, $user, $status, "game", $row["game_name"],
-                               "stats by " . $row["username"] . ": " . stat_line($row));
+                               "stats by " . $row["username"] . " (nick: " . $row["nickname"]
+                               . ", " . (STAT_MODES[$row["mode"]] ?? $row["mode"])
+                               . ($row["character_name"] !== "" ? ", character: " . $row["character_name"] : "")
+                               . "): " . stat_line($row, stat_fields_for($row["game_name"], $row["mode"])));
+
+                    // hráč dostane notifikáciu do zvončeka
+                    notify_stats($conn, (int)$row["user_id"], $adminId, "stats_" . $status, (int)$row["game_id"]);
+
                     flash("ok", "Stats " . $status . ".");
                 }
             }
@@ -60,7 +67,8 @@
     $flash = pull_flash();
 
     $pending = mysqli_fetch_all(mysqli_query($conn,
-        "SELECT s.id, s.game_id, s.screenshot, s.created_at, g.name AS game_name, u.id AS uid, u.username" . $columns . "
+        "SELECT s.id, s.game_id, s.nickname, s.character_name, s.mode, s.screenshot, s.rank_screenshot, s.created_at,
+                g.name AS game_name, u.id AS uid, u.username" . $columns . "
            FROM game_stats s
            JOIN games g ON g.id = s.game_id
            JOIN users u ON u.id = s.user_id
@@ -133,7 +141,7 @@
             <h1>Stats review<?= $pending ? " (" . count($pending) . ")" : "" ?></h1>
         </div>
 
-        <p class="rating-meta">Check the screenshot, then approve or reject. Approved stats show up on the game's stats page.</p>
+        <p class="rating-meta">Check the screenshots, then approve or reject. Approved stats show up on the game's stats page.</p>
 
         <?php if ($flash): ?>
             <div class="flash-msg <?= $flash[0] === "ok" ? "ok" : "error" ?>"><?= e($flash[1]) ?></div>
@@ -150,27 +158,43 @@
                     <tr>
                         <th>SENT</th>
                         <th>PLAYER</th>
+                        <th>NICK</th>
                         <th>GAME</th>
-                        <?php foreach (STAT_FIELDS as $label): ?><th><?= e(strtoupper($label)) ?></th><?php endforeach; ?>
-                        <th>SCREENSHOT</th>
+                        <th>CHARACTER</th>
+                        <th>MODE</th>
+                        <th>STATS</th>
+                        <th>SCREENSHOTS</th>
                         <th></th>
                     </tr>
                 </thead>
 
                 <tbody>
                 <?php foreach ($pending as $r): ?>
-                    <?php $src = stat_src($r["screenshot"]); ?>
+                    <?php
+                        $src  = stat_src($r["screenshot"]);
+                        $rsrc = stat_src($r["rank_screenshot"] ?? "");
+                    ?>
                     <tr>
                         <td><?= e(date("j. n. Y H:i", strtotime($r["created_at"]))) ?></td>
                         <td><a class="review-user" href="account.php?id=<?= (int)$r["uid"] ?>"><?= e($r["username"]) ?></a></td>
+                        <td><?= $r["nickname"] !== "" ? e($r["nickname"]) : "—" ?></td>
                         <td><a class="review-user" href="game.php?id=<?= (int)$r["game_id"] ?>#stats"><?= e($r["game_name"]) ?></a></td>
-                        <?php foreach ($keys as $k): ?><td><?= (int)$r[$k] ?></td><?php endforeach; ?>
+                        <td><?= $r["character_name"] !== "" ? e($r["character_name"]) : "—" ?></td>
+                        <td><?= e(STAT_MODES[$r["mode"]] ?? $r["mode"]) ?></td>
+                        <td class="stat-line"><?= e(stat_line($r, stat_fields_for($r["game_name"], $r["mode"]))) ?></td>
                         <td>
-                            <?php if ($src !== ""): ?>
-                            <a href="<?= e($src) ?>" target="_blank" rel="noopener" title="Open full size">
-                                <img class="shot-thumb" src="<?= e($src) ?>" alt="Screenshot">
-                            </a>
-                            <?php endif; ?>
+                            <div class="shots">
+                                <?php if ($src !== ""): ?>
+                                <a href="<?= e($src) ?>" target="_blank" rel="noopener" title="Stats screenshot – open full size">
+                                    <img class="shot-thumb" src="<?= e($src) ?>" alt="Stats screenshot">
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($rsrc !== ""): ?>
+                                <a href="<?= e($rsrc) ?>" target="_blank" rel="noopener" title="Rank progress – open full size">
+                                    <img class="shot-thumb" src="<?= e($rsrc) ?>" alt="Rank progress">
+                                </a>
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td class="users-action stats-actions">
                             <form method="POST" action="stats-review.php">

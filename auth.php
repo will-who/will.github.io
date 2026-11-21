@@ -441,13 +441,14 @@
         $unread = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
 
         $stmt = mysqli_prepare($conn,
-            "SELECT n.id, n.type, n.is_read, n.from_user_id, n.media_id, u.username, u.avatar,
+            "SELECT n.id, n.type, n.is_read, n.from_user_id, n.media_id, n.game_id, u.username, u.avatar,
                     TIMESTAMPDIFF(SECOND, n.created_at, NOW()) AS ago,
-                    f.status AS fstatus, m.caption AS clip_caption
+                    f.status AS fstatus, m.caption AS clip_caption, gm.name AS stats_game
                FROM notifications n
                JOIN users u ON u.id = n.from_user_id
                LEFT JOIN friendships f ON f.requester_id = n.from_user_id AND f.addressee_id = n.user_id
                LEFT JOIN game_media m ON m.id = n.media_id
+               LEFT JOIN games gm ON gm.id = n.game_id
               WHERE n.user_id = ?
               ORDER BY n.created_at DESC, n.id DESC
               LIMIT 20");
@@ -504,6 +505,14 @@
                 $h .= '<div>' . $name . ' accepted your friend request</div>';
                 $h .= '<small>' . e(time_ago($it["ago"])) . '</small>';
             }
+            elseif ($it["type"] === "stats_approved" || $it["type"] === "stats_rejected") {
+                $approved = $it["type"] === "stats_approved";
+                $gameUrl  = "game-stats.php?id=" . (int)$it["game_id"] . ($approved ? "" : "#mine");
+                $gameLink = '<a href="' . e($gameUrl) . '"><strong>' . e((string)$it["stats_game"]) . '</strong></a>';
+
+                $h .= '<div>' . $name . ($approved ? ' approved' : ' rejected') . ' your stats for ' . $gameLink . '</div>';
+                $h .= '<small>' . e(time_ago($it["ago"])) . '</small>';
+            }
             elseif ($it["type"] === "clip_like" || $it["type"] === "clip_comment") {
                 $isLike  = $it["type"] === "clip_like";
                 $clipUrl = "clip.php?id=" . (int)$it["media_id"] . ($isLike ? "" : "#comments");
@@ -554,6 +563,16 @@
         mysqli_stmt_execute($stmt);
     }
 
+    // Notifikácia o výsledku kontroly štatov (typ: stats_approved / stats_rejected)
+    function notify_stats($conn, $toUserId, $fromUserId, $type, $gameId) {
+        $to = (int)$toUserId; $from = (int)$fromUserId; $gid = (int)$gameId;
+
+        $stmt = mysqli_prepare($conn,
+            "INSERT INTO notifications (user_id, from_user_id, type, game_id) VALUES (?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "iisi", $to, $from, $type, $gid);
+        mysqli_stmt_execute($stmt);
+    }
+
     function drop_clip_notification($conn, $toUserId, $fromUserId, $type, $mediaId) {
         $to = (int)$toUserId; $from = (int)$fromUserId; $mid = (int)$mediaId;
         $stmt = mysqli_prepare($conn,
@@ -582,24 +601,143 @@
         return preg_match('/^[A-Za-z0-9_.\-]{1,120}$/', (string)$file) ? MEDIA_DIR . "/" . $file : "";
     }
 
-    /* ---------- Staty k hrám (Kills / Assists / Deaths) ---------- */
+    // Veľkosť z php.ini ("40M", "2G", "512K") v bajtoch
+    function ini_size_bytes($v) {
+        $v = trim((string)$v);
+        if ($v === "") {
+            return 0;
+        }
+        $n = (float)$v;
+        switch (strtolower(substr($v, -1))) {
+            case "g": $n *= 1024;
+            case "m": $n *= 1024;
+            case "k": $n *= 1024;
+        }
+        return (int)$n;
+    }
+
+    const CLIP_MAX_BYTES = 100 * 1024 * 1024;     // náš limit pre MP4 klip: 100 MB
+
+    // Najväčší povolený MP4 klip v bajtoch: menší z nášho limitu a limitov servera (php.ini)
+    function clip_upload_limit() {
+        $limits = [CLIP_MAX_BYTES];
+        foreach (["upload_max_filesize", "post_max_size"] as $k) {
+            $b = ini_size_bytes(ini_get($k));
+            if ($b > 0) {
+                $limits[] = $b;
+            }
+        }
+        return min($limits);
+    }
+
+    /* ---------- Staty k hrám ---------- */
 
     const STATS_DIR = "uploads/stats";
 
-    // Staty, ktoré sa dajú pridávať. Kľúč = názov stĺpca v tabuľke game_stats, hodnota = popis.
-    // Nový stat: pridaj do game_stats stĺpec (INT UNSIGNED NOT NULL DEFAULT 0) a jeden riadok sem.
-    const STAT_FIELDS = ["kills" => "Kills", "assists" => "Assists", "deaths" => "Deaths"];
+    // Všetky staty, ktoré sa dajú zadať: kľúč = stĺpec v game_stats => [popis, minimum, maximum].
+    // Nový stat: pridaj stĺpec do game_stats a jeden riadok sem (a prípadne do pravidiel hier nižšie).
+    const STAT_COLUMNS = [
+        "kills"   => ["Kills",      0,      99999],
+        "assists" => ["Assists",    0,      99999],
+        "deaths"  => ["Deaths",     0,      99999],
+        "knocks"  => ["Knocks",     0,      99999],
+        "damage"  => ["Damage",     0,      9999999],
+        "rp"      => ["RP",         -99999, 99999],
+        "percent" => ["Progress %", -100,   100],
+        "score"   => ["Score",      0,      99999999],
+    ];
+
+    // Pravidlá pre jednotlivé hry (hľadá sa časť názvu hry, bez ohľadu na veľkosť písmen).
+    // Základ pre každú hru je kills, assists, deaths.
+    //   replace    = nahradí stat iným (Apex: deaths -> knocks)
+    //   add        = pridá stat vždy
+    //   ranked_add = pridá stat len v režime Ranked
+    const STAT_GAME_RULES = [
+        "apex"          => ["replace" => ["deaths" => "knocks"], "add" => ["damage"], "ranked_add" => ["rp"]],
+        "overwatch"     => ["add" => ["damage"], "ranked_add" => ["percent"]],
+        "call of duty"  => ["add" => ["damage", "score"]],
+        "deadlock"      => ["add" => ["damage"]],
+        "marvel rivals" => ["add" => ["damage"]],
+        "team fortress" => ["add" => ["damage"]],
+    ];
+
+    // Režimy hry pri statoch. Pri "ranked" sa dá poslať aj druhý screenshot (postup v ranku).
+    const STAT_MODES = ["quickplay" => "Quick play", "ranked" => "Ranked"];
+
+    // Staty, ktoré sa pri danej hre a režime zadávajú: [stĺpec => popis]
+    function stat_fields_for($gameName, $mode = "quickplay") {
+        $keys = ["kills", "assists", "deaths"];
+        $n    = mb_strtolower((string)$gameName, "UTF-8");
+
+        foreach (STAT_GAME_RULES as $part => $rule) {
+            if (mb_strpos($n, $part) === false) {
+                continue;
+            }
+            foreach ($rule["replace"] ?? [] as $from => $to) {
+                $i = array_search($from, $keys, true);
+                if ($i !== false) {
+                    $keys[$i] = $to;
+                }
+            }
+            foreach ($rule["add"] ?? [] as $k) {
+                $keys[] = $k;
+            }
+            if ($mode === "ranked") {
+                foreach ($rule["ranked_add"] ?? [] as $k) {
+                    $keys[] = $k;
+                }
+            }
+        }
+
+        $fields = [];
+        foreach (array_unique($keys) as $k) {
+            $fields[$k] = STAT_COLUMNS[$k][0];
+        }
+        return $fields;
+    }
+
+    // Hodnota štatu na zobrazenie: RP a Progress % so znamienkom, % s percentom, damage s medzerami
+    function stat_value($key, $value) {
+        $v = (int)$value;
+
+        if ($key === "rp") {
+            return ($v > 0 ? "+" : "") . $v;
+        }
+        if ($key === "percent") {
+            return ($v > 0 ? "+" : "") . $v . "%";
+        }
+        if ($key === "damage" || $key === "score") {
+            return number_format($v, 0, ",", " ");
+        }
+        return (string)$v;
+    }
+
+    // Hry, pri ktorých sa pri statoch meno postavy nezadáva.
+    // Porovnáva sa časť názvu hry (bez ohľadu na veľkosť písmen), takže "Call of Duty Warzone"
+    // aj "Call of Duty: Black Ops" sú vynechané.
+    const NO_CHARACTER_GAMES = ["call of duty", "fortnite"];
+
+    // Treba pri tejto hre pri statoch zadať meno postavy?
+    function game_needs_character($gameName) {
+        $n = mb_strtolower((string)$gameName, "UTF-8");
+        foreach (NO_CHARACTER_GAMES as $part) {
+            if ($part !== "" && mb_strpos($n, $part) !== false) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     // Bezpečná cesta k screenshotu k statom alebo ""
     function stat_src($file) {
         return preg_match('/^[A-Za-z0-9_.\-]{1,120}$/', (string)$file) ? STATS_DIR . "/" . $file : "";
     }
 
-    // "Kills 10, Assists 2, Deaths 5"
-    function stat_line($row) {
+    // "Kills 10, Assists 2, Knocks 3, Damage 12 400, RP +45" (podľa zadaných polí)
+    function stat_line($row, $fields) {
         $parts = [];
-        foreach (STAT_FIELDS as $key => $label) {
-            $parts[] = $label . " " . (int)($row[$key] ?? 0);
+        foreach ($fields as $key => $label) {
+            $parts[] = $label . " " . stat_value($key, $row[$key] ?? 0);
         }
         return implode(", ", $parts);
     }

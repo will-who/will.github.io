@@ -142,7 +142,7 @@
         $likeCount = clip_likes_received($conn, $viewId);
 
         $stmt = mysqli_prepare($conn,
-            "SELECT m.id, m.game_id, g.name AS game_name, m.video_id, m.caption,
+            "SELECT m.id, m.game_id, g.name AS game_name, m.video_id, m.file, m.caption,
                     (SELECT COUNT(*) FROM media_likes l WHERE l.media_id = m.id) AS likes,
                     (SELECT COUNT(*) FROM media_comments cm WHERE cm.media_id = m.id) AS comments
                FROM game_media m
@@ -333,9 +333,17 @@
                 <div class="gallery-grid clip-grid">
                     <?php foreach ($clips as $cl): ?>
                     <figure class="media-item">
+                        <?php $vsrc = media_src($cl["file"]); ?>
+                        <?php if ($vsrc !== ""): ?>
+                        <a class="clip-thumb has-video" href="clip.php?id=<?= (int)$cl["id"] ?>" aria-label="Open clip">
+                            <video src="<?= e($vsrc) ?>#t=0.5" preload="metadata" muted playsinline></video>
+                            <span class="clip-play">▶</span>
+                        </a>
+                        <?php else: ?>
                         <a class="clip-thumb" href="clip.php?id=<?= (int)$cl["id"] ?>"
                            style="background-image: url('https://i.ytimg.com/vi/<?= e($cl["video_id"]) ?>/hqdefault.jpg');"
                            aria-label="Open clip"><span class="clip-play">▶</span></a>
+                        <?php endif; ?>
                         <figcaption>
                             <?php if ($cl["caption"] !== ""): ?>
                             <span class="media-caption"><?= e($cl["caption"]) ?></span>

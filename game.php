@@ -107,6 +107,8 @@
     $approvedStats   = 0;
     $myPendingStats  = 0;
     $pendingStatsAll = 0;
+    $lastNick        = "";
+    $lastCharacter   = "";
 
     if ($game) {
         $stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM game_stats WHERE game_id = ? AND status = 'approved'");
@@ -120,6 +122,15 @@
             mysqli_stmt_bind_param($stmt, "ii", $game["id"], $user["id"]);
             mysqli_stmt_execute($stmt);
             $myPendingStats = (int)mysqli_fetch_row(mysqli_stmt_get_result($stmt))[0];
+
+            // posledný nick, ktorý používateľ pri tejto hre zadal (predvyplní sa)
+            $stmt = mysqli_prepare($conn,
+                "SELECT nickname, character_name FROM game_stats WHERE game_id = ? AND user_id = ? ORDER BY id DESC LIMIT 1");
+            mysqli_stmt_bind_param($stmt, "ii", $game["id"], $user["id"]);
+            mysqli_stmt_execute($stmt);
+            $lastNickRow = mysqli_fetch_row(mysqli_stmt_get_result($stmt));
+            $lastNick      = $lastNickRow ? (string)$lastNickRow[0] : "";
+            $lastCharacter = $lastNickRow ? (string)$lastNickRow[1] : "";
         }
         if (is_admin($user)) {
             $pendingStatsAll = pending_stats_count($conn);
@@ -305,18 +316,53 @@
                             <input type="hidden" name="action" value="submit">
                             <input type="hidden" name="game_id" value="<?= (int)$game["id"] ?>">
 
+                            <span class="file-label">Mode</span>
+                            <div class="mode-picker">
+                                <?php foreach (STAT_MODES as $mk => $mLabel): ?>
+                                <label><input type="radio" name="mode" value="<?= e($mk) ?>"<?= $mk === "quickplay" ? " checked" : "" ?>> <?= e($mLabel) ?></label>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <label class="file-label" for="stat_nick">Your nickname in this game (required)</label>
+                            <input type="text" id="stat_nick" name="nickname" maxlength="40" required
+                                   placeholder="Your in-game name" autocomplete="off"
+                                   value="<?= e($lastNick) ?>">
+
+                            <?php if (game_needs_character($game["name"])): ?>
+                            <label class="file-label" for="stat_char">Character you played (required)</label>
+                            <input type="text" id="stat_char" name="character" maxlength="60" required
+                                   placeholder="Name of the character" autocomplete="off"
+                                   value="<?= e($lastCharacter) ?>">
+                            <?php endif; ?>
+
+                            <?php
+                                // staty pre túto hru: základ + pridané (napr. damage) + len pre Ranked (RP, Progress %)
+                                $qFields = stat_fields_for($game["name"], "quickplay");
+                                $rFields = stat_fields_for($game["name"], "ranked");
+                            ?>
                             <div class="stats-inputs">
-                                <?php foreach (STAT_FIELDS as $key => $label): ?>
-                                <label for="stat_<?= e($key) ?>"><?= e($label) ?>
+                                <?php foreach ($rFields as $key => $label): ?>
+                                <label for="stat_<?= e($key) ?>"<?= isset($qFields[$key]) ? "" : ' class="ranked-only"' ?>><?= e($label) ?>
                                     <input type="number" id="stat_<?= e($key) ?>" name="stat[<?= e($key) ?>]"
-                                           min="0" max="99999" step="1" value="0" required>
+                                           min="<?= (int)STAT_COLUMNS[$key][1] ?>" max="<?= (int)STAT_COLUMNS[$key][2] ?>"
+                                           step="1" value="0" required>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
 
-                            <label class="file-label" for="stat_shot">Screenshot as proof (required, JPG, PNG, GIF or WEBP, max 5 MB)</label>
+                            <?php if (count($rFields) > count($qFields)): ?>
+                            <p class="rating-meta ranked-only">RP and Progress % are the change from this match and can be negative (for example -23).</p>
+                            <?php endif; ?>
+
+                            <label class="file-label" for="stat_shot">Screenshot of your stats (required, JPG, PNG, GIF or WEBP, max 5 MB)</label>
                             <input type="file" id="stat_shot" name="screenshot"
                                    accept="image/jpeg,image/png,image/gif,image/webp" required>
+
+                            <div class="rank-shot-box" id="rankShotBox">
+                                <label class="file-label" for="stat_rank_shot">Screenshot of your rank progress (optional, add it if it is needed)</label>
+                                <input type="file" id="stat_rank_shot" name="rank_screenshot"
+                                       accept="image/jpeg,image/png,image/gif,image/webp">
+                            </div>
 
                             <p class="rating-meta">An admin has to approve your stats before they show up.</p>
 
@@ -355,12 +401,24 @@
                             <button type="submit" class="account-button">UPLOAD</button>
                         </form>
 
+                        <form method="POST" action="media.php" enctype="multipart/form-data">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="game_id" value="<?= (int)$game["id"] ?>">
+                            <input type="hidden" name="action" value="add_clip_file">
+
+                            <h3>MP4 clip</h3>
+                            <input type="file" name="clip_file" accept="video/mp4,.mp4" required>
+                            <input type="text" name="caption" maxlength="150" placeholder="Caption (optional)" autocomplete="off">
+                            <small class="rating-meta">MP4 video, max <?= (int)floor(clip_upload_limit() / 1048576) ?> MB</small>
+                            <button type="submit" class="account-button">UPLOAD CLIP</button>
+                        </form>
+
                         <form method="POST" action="media.php">
                             <?= csrf_field() ?>
                             <input type="hidden" name="game_id" value="<?= (int)$game["id"] ?>">
                             <input type="hidden" name="action" value="add_clip">
 
-                            <h3>Clip</h3>
+                            <h3>YouTube clip</h3>
                             <input type="text" name="clip_url" maxlength="300" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" required>
                             <input type="text" name="caption" maxlength="150" placeholder="Caption (optional)" autocomplete="off">
                             <small class="rating-meta">Paste a YouTube link</small>
@@ -418,9 +476,17 @@
                 <div class="gallery-grid clip-grid">
                     <?php foreach ($clips as $m): ?>
                     <figure class="media-item">
+                        <?php $vsrc = media_src($m["file"]); ?>
+                        <?php if ($vsrc !== ""): ?>
+                        <a class="clip-thumb has-video" href="clip.php?id=<?= (int)$m["id"] ?>" aria-label="Open clip">
+                            <video src="<?= e($vsrc) ?>#t=0.5" preload="metadata" muted playsinline></video>
+                            <span class="clip-play">▶</span>
+                        </a>
+                        <?php else: ?>
                         <a class="clip-thumb" href="clip.php?id=<?= (int)$m["id"] ?>"
                            style="background-image: url('https://i.ytimg.com/vi/<?= e($m["video_id"]) ?>/hqdefault.jpg');"
                            aria-label="Open clip"><span class="clip-play">▶</span></a>
+                        <?php endif; ?>
                         <?= $mediaMeta($m) ?>
                         <small class="media-stats">♥ <?= (int)$m["likes"] ?> · 💬 <?= (int)$m["comments"] ?> · <a href="clip.php?id=<?= (int)$m["id"] ?>#comments">Open</a></small>
                     </figure>
@@ -552,6 +618,37 @@
                 if (e.key === "ArrowLeft")  { show(idx - 1); }
                 if (e.key === "ArrowRight") { show(idx + 1); }
             });
+        })();
+    </script>
+
+    <script>
+        // Staty: pri režime Ranked sa ukážu polia navyše (RP / Progress %) a voliteľný druhý screenshot.
+        (function () {
+            var form = document.querySelector(".stats-form");
+            var box  = document.getElementById("rankShotBox");
+
+            if (!form || !box) { return; }
+
+            var extras = form.querySelectorAll(".ranked-only");
+            var radios = form.querySelectorAll('input[name="mode"]');
+
+            function sync() {
+                var checked = form.querySelector('input[name="mode"]:checked');
+                var ranked  = !!checked && checked.value === "ranked";
+
+                box.style.display = ranked ? "" : "none";
+
+                for (var i = 0; i < extras.length; i++) {
+                    extras[i].style.display = ranked ? "" : "none";
+                    var inputs = extras[i].querySelectorAll("input");
+                    for (var j = 0; j < inputs.length; j++) { inputs[j].disabled = !ranked; }
+                }
+            }
+
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].addEventListener("change", sync);
+            }
+            sync();
         })();
     </script>
 

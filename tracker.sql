@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2026 at 10:48 AM
+-- Generation Time: Nov 21, 2026 at 12:31 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -62,7 +62,13 @@ INSERT INTO `changelog` (`id`, `user_id`, `username`, `action`, `entity`, `entit
 (17, 9, 'Lubo', 'edited', 'news', 'Apex Legends season 31', 'text changed', '2026-11-13 09:22:43'),
 (18, 9, 'Lubo', 'added', 'news', 'Apex Legends Gozdilla Event', 'game: Apex Legends', '2026-11-13 09:23:51'),
 (19, 9, 'Lubo', 'added', 'news', 'Overwatch mid season 5 patch notes', 'game: Overwatch', '2026-11-13 09:26:37'),
-(20, 4, 'admin', 'approved', 'game', 'Overwatch', 'stats by Lubo: Kills 11, Assists 9, Deaths 13', '2026-11-13 09:41:13');
+(20, 4, 'admin', 'approved', 'game', 'Overwatch', 'stats by Lubo: Kills 11, Assists 9, Deaths 13', '2026-11-13 09:41:13'),
+(21, 4, 'admin', 'approved', 'game', 'Apex Legends', 'stats by Lubo (nick: lubeno_b, Ranked, character: Lifeline): Kills 2, Assists 1, Knocks 2, Damage 1 165, RP +100', '2026-11-20 09:00:23'),
+(22, 9, 'Lubo', 'edited', 'game', 'Call of Duty Warzone', 'image source changed', '2026-11-20 09:21:38'),
+(23, 9, 'Lubo', 'edited', 'game', 'Call of Duty', 'title: \"Call of Duty Warzone\" → \"Call of Duty\"', '2026-11-20 09:21:49'),
+(24, 9, 'Lubo', 'edited', 'game', 'Call of Duty®', 'title: \"Call of Duty\" → \"Call of Duty®\"', '2026-11-20 09:22:05'),
+(25, 4, 'admin', 'approved', 'game', 'Apex Legends', 'stats by Lubo (nick: lubeno_b, Ranked, character: Lifeline): Kills 4, Assists 4, Knocks 4, Damage 1 369, RP +296', '2026-11-21 11:27:50'),
+(26, 4, 'admin', 'approved', 'game', 'Call of Duty®', 'stats by Lubo (nick: DogePink6059, Quick play): Kills 15, Assists 0, Deaths 4, Damage 6 369, Score 6 760', '2026-11-21 11:27:53');
 
 -- --------------------------------------------------------
 
@@ -128,7 +134,7 @@ INSERT INTO `games` (`id`, `name`, `genre`, `image_back`, `image_front`, `image_
 (2, 'Marvel Rivals', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/2767030/library_600x900_2x.jpg', NULL, 'cover', 'center', 'Fast 6v6 hero shooter featuring Marvel characters. Each hero has unique abilities and team-up powers, and the maps can be partly destroyed during the fight.', '2026-10-27 07:52:04', '2026-11-13 09:16:00'),
 (3, 'Apex Legends', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1172470/library_600x900.jpg', NULL, '120%', 'center', 'Free-to-play battle royale hero shooter from Respawn Entertainment. Squads drop onto the map, pick a Legend with unique abilities, loot weapons and fight to be the last squad standing.', '2026-10-27 08:35:53', '2026-11-13 09:15:25'),
 (4, 'Tom Clancy\'s Rainbow Six Siege', 'First person shooter', 'https://cdn.akamai.steamstatic.com/steam/apps/359550/library_600x900.jpg', NULL, 'cover', 'center', 'aksjclpsadmc[ozjv]oasc', '2026-10-27 10:38:19', '2026-11-13 09:15:48'),
-(6, 'Call of Duty Warzone', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1962663/library_600x900_2x.jpg', NULL, 'cover', 'center', NULL, '2026-10-27 13:01:00', '2026-11-13 09:15:31'),
+(6, 'Call of Duty®', 'First person shooter', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUFNYRzXhFBe6m6gaGktZ-GL2z_cG4A6QWnifHmDrjKA&s=10', NULL, 'cover', 'center', NULL, '2026-10-27 13:01:00', '2026-11-20 09:22:05'),
 (7, 'Deadlock', 'Third person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/1422450/logo.png', NULL, 'contain', 'center', NULL, '2026-10-28 07:23:15', '2026-11-13 09:16:10'),
 (8, 'Team Fortress 2', 'First person shooter', 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/440/library_600x900_2x.jpg', NULL, '100%', 'center', NULL, '2026-10-28 07:24:06', '2026-11-13 09:15:52'),
 (9, 'Valorant', 'First person shooter', 'https://www.riotgames.com/darkroom/900/82a04f6bf37d1258c3242713d926c50b:a9101749edc9242665d310a120d3f710/v26-a6-website-productcardvisual-840x1413.jpg', NULL, 'cover', 'center', NULL, '2026-10-28 07:24:17', '2026-11-13 09:15:44'),
@@ -164,6 +170,13 @@ CREATE TABLE `game_media` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `game_media`
+--
+
+INSERT INTO `game_media` (`id`, `game_id`, `user_id`, `type`, `file`, `video_id`, `caption`, `created_at`) VALUES
+(1, 9, 9, 'clip', '9_9_30e5806595521cab.mp4', NULL, '', '2026-11-21 11:25:35');
+
 -- --------------------------------------------------------
 
 --
@@ -175,6 +188,7 @@ CREATE TABLE `game_stats` (
   `game_id` int(10) UNSIGNED NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
   `nickname` varchar(40) NOT NULL DEFAULT '',
+  `character_name` varchar(60) NOT NULL DEFAULT '',
   `kills` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `assists` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `deaths` int(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -182,15 +196,26 @@ CREATE TABLE `game_stats` (
   `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
   `reviewed_by` int(10) UNSIGNED DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `mode` enum('quickplay','ranked') NOT NULL DEFAULT 'quickplay',
+  `knocks` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `damage` int(10) UNSIGNED NOT NULL DEFAULT 0,
+  `rp` int(11) NOT NULL DEFAULT 0,
+  `percent` int(11) NOT NULL DEFAULT 0,
+  `rank_screenshot` varchar(255) DEFAULT NULL,
+  `score` int(10) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `game_stats`
 --
 
-INSERT INTO `game_stats` (`id`, `game_id`, `user_id`, `nickname`, `kills`, `assists`, `deaths`, `screenshot`, `status`, `reviewed_by`, `reviewed_at`, `created_at`) VALUES
-(1, 1, 9, '', 11, 9, 13, 'stat_1_9_f19737ca7879641e.jpg', 'approved', 4, '2026-11-13 09:41:13', '2026-11-13 09:35:33');
+INSERT INTO `game_stats` (`id`, `game_id`, `user_id`, `nickname`, `character_name`, `kills`, `assists`, `deaths`, `screenshot`, `status`, `reviewed_by`, `reviewed_at`, `created_at`, `mode`, `knocks`, `damage`, `rp`, `percent`, `rank_screenshot`, `score`) VALUES
+(5, 3, 9, 'lubeno_b', 'Lifeline', 4, 4, 0, 'stat_3_9_bb42ec2e8cf15ce2.png', 'approved', 4, '2026-11-21 11:27:50', '2026-11-21 11:14:13', 'ranked', 4, 1369, 296, 0, 'stat_3_9_2ba7220ba59e7e47.png', 0),
+(6, 3, 9, 'lubeno_b', 'Lifeline', 2, 8, 0, 'stat_3_9_b41a79e53d4cc61c.png', 'pending', NULL, NULL, '2026-11-21 11:16:11', 'ranked', 3, 1402, 282, 0, 'stat_3_9_243a1defa871e40f.png', 0),
+(7, 3, 9, 'lubeno_b', 'Lifeline', 3, 1, 0, 'stat_3_9_26cf768ceed52bc2.png', 'pending', NULL, NULL, '2026-11-21 11:18:21', 'ranked', 3, 1304, 207, 0, 'stat_3_9_9d54f7b7164b96f8.png', 0),
+(8, 6, 9, 'DogePink6059', '', 15, 0, 4, 'stat_6_9_48a4ce98343b28a8.png', 'approved', 4, '2026-11-21 11:27:53', '2026-11-21 11:23:24', 'quickplay', 0, 6369, 0, 0, NULL, 6760),
+(9, 6, 9, 'DogePink6059', '', 13, 2, 2, 'stat_6_9_2210564a8f24f2e7.png', 'pending', NULL, NULL, '2026-11-21 11:25:04', 'quickplay', 0, 5789, 0, 0, NULL, 7140);
 
 -- --------------------------------------------------------
 
@@ -290,10 +315,19 @@ CREATE TABLE `notifications` (
   `user_id` int(10) UNSIGNED NOT NULL,
   `from_user_id` int(10) UNSIGNED NOT NULL,
   `media_id` int(10) UNSIGNED DEFAULT NULL,
+  `game_id` int(10) UNSIGNED DEFAULT NULL,
   `type` varchar(30) NOT NULL,
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `from_user_id`, `media_id`, `game_id`, `type`, `is_read`, `created_at`) VALUES
+(1, 9, 4, NULL, 3, 'stats_approved', 1, '2026-11-21 11:27:50'),
+(2, 9, 4, NULL, 6, 'stats_approved', 1, '2026-11-21 11:27:53');
 
 -- --------------------------------------------------------
 
@@ -361,7 +395,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `token`, `ip_address`, `created_at`, `expires_at`) VALUES
-(31, 9, '687eae00c46b187ba625a9c431fed0caffb81c31059b11ac3475293980b48d2f', '::1', '2026-11-13 09:43:06', '2026-11-20 10:43:06');
+(35, 9, '3beefa0414ce4f7e5c5bcd79aa7ab304da8fdf7478c743fd4ac38ea87ee962f8', '::1', '2026-11-21 11:27:59', '2026-11-28 12:27:59');
 
 -- --------------------------------------------------------
 
@@ -407,9 +441,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `avatar`, `password_hash`, `role`, `is_active`, `created_at`, `last_login`) VALUES
-(4, 'admin', 'lubkobernhauser2@gmail.com', NULL, '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-13 09:42:48'),
+(4, 'admin', 'lubkobernhauser2@gmail.com', NULL, '$2y$10$yPuTAK9E6jnTxn8xUkrmDugrcuvkLfu.loFt1IXV.5HcJBec4GWUe', 'admin', 1, '2026-10-28 07:53:27', '2026-11-21 11:26:28'),
 (7, 'Vilo', 'amaha1337@centrum.sk', '7_b76f497fd062070b.jpg', '$2y$10$A5joDj0fPJqnblYlu7FIXO2OiRMmV91l0FEhaqAtGBj0ggGrhI4i6', 'editor', 1, '2026-11-02 09:05:58', '2026-11-13 09:09:52'),
-(9, 'Lubo', 'luboslav.berny@gmail.com', '9_aaf9b28f202706e7.png', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'editor', 1, '2026-11-02 09:19:08', '2026-11-13 09:43:06'),
+(9, 'Lubo', 'luboslav.berny@gmail.com', '9_aaf9b28f202706e7.png', '$2y$10$i1DuE9ddxfzIEjpnsaySdu74XzYSLxq21Sa5e7lPIEsHiR3NFAHUC', 'editor', 1, '2026-11-02 09:19:08', '2026-11-21 11:27:59'),
 (10, 'user', 'doge.pink123@gmail.com', NULL, '$2y$10$hk.2bAO6Kl.XiIqHRr0x1.nZ4OwxkOUsziC41ND6MYCAtaRBzVz8O', 'user', 1, '2026-11-13 09:08:37', '2026-11-13 09:08:37');
 
 --
@@ -507,7 +541,8 @@ ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_notif_user` (`user_id`,`is_read`),
   ADD KEY `fk_notif_from` (`from_user_id`),
-  ADD KEY `idx_notif_media` (`media_id`);
+  ADD KEY `idx_notif_media` (`media_id`),
+  ADD KEY `idx_notif_game` (`game_id`);
 
 --
 -- Indexes for table `password_resets`
@@ -555,7 +590,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `changelog`
 --
 ALTER TABLE `changelog`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `friendships`
@@ -579,13 +614,13 @@ ALTER TABLE `game_images`
 -- AUTO_INCREMENT for table `game_media`
 --
 ALTER TABLE `game_media`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `game_stats`
 --
 ALTER TABLE `game_stats`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `media_comments`
@@ -603,7 +638,7 @@ ALTER TABLE `news`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
@@ -615,7 +650,7 @@ ALTER TABLE `password_resets`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -706,6 +741,7 @@ ALTER TABLE `news`
 --
 ALTER TABLE `notifications`
   ADD CONSTRAINT `fk_notif_from` FOREIGN KEY (`from_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notif_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_notif_media` FOREIGN KEY (`media_id`) REFERENCES `game_media` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 

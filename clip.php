@@ -9,7 +9,7 @@
     $clip = null;
     if ($id) {
         $stmt = mysqli_prepare($conn,
-            "SELECT m.id, m.game_id, m.user_id, m.video_id, m.caption, m.created_at,
+            "SELECT m.id, m.game_id, m.user_id, m.video_id, m.file, m.caption, m.created_at,
                     u.username, u.avatar, g.name AS game_name
                FROM game_media m
                JOIN users u ON u.id = m.user_id
@@ -219,10 +219,15 @@
 
             <article class="clip-page">
 
+                <?php $videoFile = media_src($clip["file"]); ?>
                 <div class="clip-player">
-                    <iframe src="https://www.youtube-nocookie.com/embed/<?= e(rawurlencode($clip["video_id"])) ?>"
+                    <?php if ($videoFile !== ""): ?>
+                    <video src="<?= e($videoFile) ?>" controls preload="metadata" playsinline></video>
+                    <?php else: ?>
+                    <iframe src="https://www.youtube-nocookie.com/embed/<?= e(rawurlencode((string)$clip["video_id"])) ?>"
                             title="<?= e($clip["caption"] !== "" ? $clip["caption"] : "Clip") ?>"
                             allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                    <?php endif; ?>
                 </div>
 
                 <h1><?= e($clip["caption"] !== "" ? $clip["caption"] : "Clip of " . $clip["game_name"]) ?></h1>

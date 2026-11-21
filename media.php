@@ -9,6 +9,17 @@
         exit;
     }
 
+    // Ak je súbor väčší než post_max_size, PHP zahodí celý formulár (POST aj FILES zostanú prázdne)
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && empty($_POST) && empty($_FILES) && (int)($_SERVER["CONTENT_LENGTH"] ?? 0) > 0) {
+        parse_str((string)parse_url((string)($_SERVER["HTTP_REFERER"] ?? ""), PHP_URL_QUERY), $refQuery);
+        $refId = (int)($refQuery["id"] ?? 0);
+
+        $_SESSION["media_flash"] = ["error", "The file is too large for the server (max "
+            . floor(clip_upload_limit() / 1048576) . " MB). Try a smaller video."];
+        header("Location: " . ($refId ? "game.php?id=" . $refId . "#media" : "track.php"));
+        exit;
+    }
+
     $uid    = (int)$user["id"];
     $gameId = filter_input(INPUT_POST, "game_id", FILTER_VALIDATE_INT);
 
@@ -99,7 +110,7 @@
             mysqli_stmt_bind_param($stmt, "i", $row["id"]);
             mysqli_stmt_execute($stmt);
 
-            if ($row["type"] === "screenshot" && media_src($row["file"]) !== "") {
+            if (media_src($row["file"]) !== "") {          // screenshot aj nahraný MP4 klip
                 @unlink(__DIR__ . "/" . media_src($row["file"]));
             }
             if ((int)$row["user_id"] !== $uid) {
@@ -140,6 +151,53 @@
             mysqli_stmt_bind_param($stmt, "iiss", $gameId, $uid, $vid, $caption);
             mysqli_stmt_execute($stmt);
             media_flash("ok", "Clip added.");
+        }
+        media_done($back);
+    }
+
+    if ($action === "add_clip_file") {
+
+        $f     = $_FILES["clip_file"] ?? null;
+        $dir   = __DIR__ . "/" . MEDIA_DIR;
+        $limit = clip_upload_limit();
+        $maxMb = floor($limit / 1048576);
+
+        if (!$f || $f["error"] === UPLOAD_ERR_NO_FILE) {
+            media_flash("error", "Choose an MP4 file first.");
+        }
+        elseif (in_array($f["error"], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) || $f["size"] > $limit) {
+            media_flash("error", "The video is too large (max " . $maxMb . " MB).");
+        }
+        elseif ($f["error"] !== UPLOAD_ERR_OK) {
+            media_flash("error", "Upload failed, try again.");
+        }
+        elseif (strtolower(pathinfo((string)$f["name"], PATHINFO_EXTENSION)) !== "mp4") {
+            media_flash("error", "Only MP4 videos are allowed.");
+        }
+        else {
+            // obsah musí byť naozaj MP4 video: v hlavičke je na pozícii 4 "ftyp" a typ súboru je video/*
+            $head = (string)@file_get_contents($f["tmp_name"], false, null, 0, 12);
+            $mime = function_exists("mime_content_type") ? (string)@mime_content_type($f["tmp_name"]) : "";
+
+            if (strlen($head) < 12 || substr($head, 4, 4) !== "ftyp" || ($mime !== "" && strpos($mime, "video/") !== 0)) {
+                media_flash("error", "This file is not a valid MP4 video.");
+            }
+            elseif (!is_dir($dir) && !mkdir($dir, 0755, true)) {
+                media_flash("error", "Could not create the upload folder.");
+            }
+            else {
+                $name = $gameId . "_" . $uid . "_" . bin2hex(random_bytes(8)) . ".mp4";
+
+                if (move_uploaded_file($f["tmp_name"], $dir . "/" . $name)) {
+                    $stmt = mysqli_prepare($conn,
+                        "INSERT INTO game_media (game_id, user_id, type, file, caption) VALUES (?, ?, 'clip', ?, ?)");
+                    mysqli_stmt_bind_param($stmt, "iiss", $gameId, $uid, $name, $caption);
+                    mysqli_stmt_execute($stmt);
+                    media_flash("ok", "Clip uploaded.");
+                } else {
+                    media_flash("error", "Could not save the video.");
+                }
+            }
         }
         media_done($back);
     }
